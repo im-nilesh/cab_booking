@@ -1,4 +1,4 @@
-import 'package:cab_booking_user/screens/WelcomeScreen.dart'; // Import WelcomeScreen
+import 'package:cab_booking_user/screens/welcome_screen.dart'; // Import WelcomeScreen
 import 'package:cab_booking_user/utils/constants.dart';
 import 'package:flutter/material.dart';
 
@@ -34,7 +34,7 @@ class CustomAnimatedSlider extends StatelessWidget {
         height: 70,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: Colors.green,
+          color: greencolor,
           boxShadow: [
             BoxShadow(
               color: Colors.black26,
@@ -59,8 +59,8 @@ class CustomAnimatedSlider extends StatelessWidget {
               ),
               builder: (context, value, child) {
                 return SizedBox(
-                  width: 70,
-                  height: 70,
+                  width: 90,
+                  height: 90,
                   child: CircularProgressIndicator(
                     value: value,
                     strokeWidth: 4,

@@ -1,5 +1,6 @@
 import 'dart:async';
-import 'package:cab_booking_user/screens/SliderScreen.dart';
+
+import 'package:cab_booking_user/screens/slider_screen.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';

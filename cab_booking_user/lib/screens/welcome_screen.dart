@@ -1,6 +1,7 @@
 import 'package:cab_booking_user/Widgets/button/custom_button.dart';
+
+import 'package:cab_booking_user/screens/signup_screen.dart'; // Import SignUpScreen
 import 'package:flutter/material.dart';
-// Import the reusable button widget
 
 class WelcomeScreen extends StatelessWidget {
   @override
@@ -42,7 +43,14 @@ class WelcomeScreen extends StatelessWidget {
             CustomButton(
               text: 'Sign Up',
               onPressed: () {
-                // Navigate to Sign Up Screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder:
+                        (context) =>
+                            SignUpScreen(), // Replace with your SignUpScreen
+                  ),
+                );
               },
             ),
             SizedBox(height: 20),
@@ -51,6 +59,14 @@ class WelcomeScreen extends StatelessWidget {
             GestureDetector(
               onTap: () {
                 // Navigate to Login Screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder:
+                        (context) =>
+                            SignUpScreen(), // Replace with your SignInScreen
+                  ),
+                );
               },
               child: Text(
                 'Already an user? Login',
