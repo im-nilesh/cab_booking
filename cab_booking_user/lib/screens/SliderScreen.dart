@@ -1,4 +1,5 @@
 import 'package:cab_booking_user/Widgets/slider/custom_slider.dart';
+import 'package:cab_booking_user/Widgets/slider/custom_animated_slider.dart';
 import 'package:flutter/material.dart';
 
 class SliderScreen extends StatefulWidget {
@@ -56,27 +57,24 @@ class _SliderScreenState extends State<SliderScreen> {
             ),
           ),
 
-          SizedBox(height: 20),
-          if (_currentPage == slides.length - 1)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30.0),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // TODO: Navigate to Home Screen
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: Text("Get Started", style: TextStyle(fontSize: 18)),
-                ),
-              ),
+          // Custom Animated Slider Button
+          Padding(
+            padding: const EdgeInsets.only(bottom: 30.0),
+            child: CustomAnimatedSlider(
+              currentIndex: _currentPage,
+              totalSlides: slides.length,
+              onNext: () {
+                if (_currentPage < slides.length - 1) {
+                  _pageController.nextPage(
+                    duration: Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                  );
+                } else {
+                  // TODO: Navigate to Home Screen
+                }
+              },
             ),
-          SizedBox(height: 30),
+          ),
         ],
       ),
     );
