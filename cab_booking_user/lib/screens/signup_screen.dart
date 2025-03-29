@@ -1,6 +1,8 @@
+import 'package:cab_booking_user/Widgets/common/custom_phoneno_textfield.dart';
+import 'package:cab_booking_user/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:country_picker/country_picker.dart';
-import 'package:cab_booking_user/Widgets/button/custom_button.dart';
+import 'package:cab_booking_user/Widgets/button/primary_button.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -15,12 +17,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: blackColor),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -35,9 +36,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
             Text(
               'Enter your mobile number',
               style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
+                fontSize: 24,
+                color: blackColor,
+                fontWeight: FontWeight.w500,
               ),
             ),
             SizedBox(height: 20),
@@ -61,8 +62,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                     decoration: BoxDecoration(
+                      color: whiteColor,
                       border: Border.all(color: Colors.grey.shade300),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
                       children: [
@@ -78,17 +80,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
                 SizedBox(width: 10),
                 Expanded(
-                  child: TextField(
-                    controller: _phoneController,
-                    keyboardType: TextInputType.phone,
-                    decoration: InputDecoration(
-                      hintText: 'Your mobile number',
-                      prefixText: '$_selectedCountryCode ',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: Colors.grey.shade300),
-                      ),
-                    ),
+                  child: CustomPhonenoTextfield(
+                    phoneController: _phoneController,
+                    selectedCountryCode: _selectedCountryCode,
                   ),
                 ),
               ],
@@ -96,21 +90,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
             SizedBox(height: 30),
 
             // Continue Button
-            CustomButton(
-              text: 'Continue',
-              onPressed: () {
-                // Handle phone number submission
-                final phoneNumber = _phoneController.text.trim();
-                if (phoneNumber.isNotEmpty) {
-                  // Proceed with the phone number
-                  print('Phone Number: $_selectedCountryCode $phoneNumber');
-                } else {
-                  // Show error
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Please enter your mobile number')),
-                  );
-                }
-              },
+            SizedBox(
+              width: double.infinity,
+              height: MediaQuery.of(context).size.height * 0.07,
+              child: PrimaryButton(
+                text: 'Continue',
+                onPressed: () {
+                  // Handle phone number submission
+                  final phoneNumber = _phoneController.text.trim();
+                  if (phoneNumber.isNotEmpty) {
+                    // Proceed with the phone number
+                    print('Phone Number: $_selectedCountryCode $phoneNumber');
+                  } else {
+                    // Show error
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Please enter your mobile number'),
+                      ),
+                    );
+                  }
+                },
+              ),
             ),
           ],
         ),

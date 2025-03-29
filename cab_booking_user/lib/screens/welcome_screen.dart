@@ -1,6 +1,7 @@
-import 'package:cab_booking_user/Widgets/button/custom_button.dart';
+import 'package:cab_booking_user/Widgets/button/primary_button.dart';
 
 import 'package:cab_booking_user/screens/signup_screen.dart'; // Import SignUpScreen
+import 'package:cab_booking_user/utils/constants.dart';
 import 'package:flutter/material.dart';
 
 class WelcomeScreen extends StatelessWidget {
@@ -34,24 +35,28 @@ class WelcomeScreen extends StatelessWidget {
             SizedBox(height: 10),
             Text(
               'Have a better sharing experience',
-              style: TextStyle(fontSize: 16, color: Colors.grey),
+              style: TextStyle(fontSize: 16, color: grayColor),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 40),
 
             // Sign Up Button
-            CustomButton(
-              text: 'Sign Up',
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder:
-                        (context) =>
-                            SignUpScreen(), // Replace with your SignUpScreen
-                  ),
-                );
-              },
+            SizedBox(
+              width: double.infinity,
+              height: MediaQuery.of(context).size.height * 0.07,
+              child: PrimaryButton(
+                text: 'Sign Up',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder:
+                          (context) =>
+                              SignUpScreen(), // Replace with your SignUpScreen
+                    ),
+                  );
+                },
+              ),
             ),
             SizedBox(height: 20),
 
@@ -70,11 +75,7 @@ class WelcomeScreen extends StatelessWidget {
               },
               child: Text(
                 'Already an user? Login',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey,
-                  decoration: TextDecoration.underline,
-                ),
+                style: TextStyle(fontSize: 14, color: grayColor2),
               ),
             ),
           ],
