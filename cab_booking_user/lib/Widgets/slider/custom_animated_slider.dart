@@ -1,3 +1,5 @@
+import 'package:cab_booking_user/screens/WelcomeScreen.dart'; // Import WelcomeScreen
+import 'package:cab_booking_user/utils/constants.dart';
 import 'package:flutter/material.dart';
 
 class CustomAnimatedSlider extends StatelessWidget {
@@ -15,7 +17,18 @@ class CustomAnimatedSlider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onNext,
+      onTap: () {
+        if (currentIndex == totalSlides - 1) {
+          // Navigate to WelcomeScreen
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => WelcomeScreen()),
+          );
+        } else {
+          // Call the onNext callback to move to the next slide
+          onNext();
+        }
+      },
       child: Container(
         width: 70,
         height: 70,
@@ -38,8 +51,8 @@ class CustomAnimatedSlider extends StatelessWidget {
             TweenAnimationBuilder<double>(
               duration: Duration(
                 milliseconds: 700,
-              ), // 🔥 Smooth animation duration
-              curve: Curves.easeInOut, // 🔥 Makes it smoother
+              ), // Smooth animation duration
+              curve: Curves.easeInOut, // Makes it smoother
               tween: Tween<double>(
                 begin: 0.0,
                 end: ((currentIndex + 1) / totalSlides).clamp(0.0, 1.0),
@@ -52,9 +65,7 @@ class CustomAnimatedSlider extends StatelessWidget {
                     value: value,
                     strokeWidth: 4,
                     backgroundColor: Colors.grey.shade300,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      Colors.green.shade700,
-                    ),
+                    valueColor: AlwaysStoppedAnimation<Color>(greencolor),
                   ),
                 );
               },
