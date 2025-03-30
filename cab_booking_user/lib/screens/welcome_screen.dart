@@ -1,6 +1,6 @@
 import 'package:cab_booking_user/Widgets/button/primary_button.dart';
 
-import 'package:cab_booking_user/screens/signup_screen.dart'; // Import SignUpScreen
+import 'package:cab_booking_user/screens/auth/signup_screen.dart'; // Import SignUpScreen
 import 'package:cab_booking_user/utils/constants.dart';
 import 'package:flutter/material.dart';
 
