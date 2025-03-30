@@ -3,6 +3,8 @@ import 'package:cab_booking_user/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:cab_booking_user/Widgets/button/primary_button.dart';
+import 'package:cab_booking_user/screens/otp_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -13,6 +15,64 @@ class _SignUpScreenState extends State<SignUpScreen> {
   String _selectedCountryCode = '+91'; // Default country code
   String _selectedCountryFlag = '🇮🇳'; // Default country flag
   final TextEditingController _phoneController = TextEditingController();
+  bool isLoading = false;
+
+  void _sendOTP() async {
+    final phoneNumber = _phoneController.text.trim();
+
+    if (phoneNumber.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please enter your mobile number')),
+      );
+      return;
+    }
+
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      await FirebaseAuth.instance.verifyPhoneNumber(
+        phoneNumber: '$_selectedCountryCode$phoneNumber',
+        verificationCompleted: (PhoneAuthCredential credential) async {
+          // Auto-retrieval of OTP
+          await FirebaseAuth.instance.signInWithCredential(credential);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Phone number verified automatically!')),
+          );
+        },
+        verificationFailed: (FirebaseAuthException e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Verification failed: ${e.message}')),
+          );
+        },
+        codeSent: (String verificationId, int? resendToken) {
+          // Navigate to OTPScreen with the verification ID
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder:
+                  (context) => OTPScreen(
+                    phoneNumber: '$_selectedCountryCode$phoneNumber',
+                    verificationId: verificationId,
+                  ),
+            ),
+          );
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {
+          // Handle timeout
+        },
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+    }
+
+    setState(() {
+      isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -95,21 +155,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               height: MediaQuery.of(context).size.height * 0.07,
               child: PrimaryButton(
                 text: 'Continue',
-                onPressed: () {
-                  // Handle phone number submission
-                  final phoneNumber = _phoneController.text.trim();
-                  if (phoneNumber.isNotEmpty) {
-                    // Proceed with the phone number
-                    print('Phone Number: $_selectedCountryCode $phoneNumber');
-                  } else {
-                    // Show error
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Please enter your mobile number'),
-                      ),
-                    );
-                  }
-                },
+                onPressed: isLoading ? () {} : _sendOTP,
               ),
             ),
           ],

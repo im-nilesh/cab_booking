@@ -1,0 +1,118 @@
+import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cab_booking_user/Widgets/button/primary_button.dart';
+import 'package:cab_booking_user/utils/constants.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:pinput/pinput.dart';
+
+class OTPScreen extends StatefulWidget {
+  final String phoneNumber;
+  final String verificationId;
+
+  OTPScreen({required this.phoneNumber, required this.verificationId});
+
+  @override
+  _OTPScreenState createState() => _OTPScreenState();
+}
+
+class _OTPScreenState extends State<OTPScreen> {
+  final TextEditingController _otpController = TextEditingController();
+  bool isLoading = false;
+
+  void _verifyOTP() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      PhoneAuthCredential credential = PhoneAuthProvider.credential(
+        verificationId: widget.verificationId,
+        smsCode: _otpController.text.trim(),
+      );
+
+      await FirebaseAuth.instance.signInWithCredential(credential);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('OTP Verified Successfully!')));
+
+      // Navigate to the home screen or next step
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Invalid OTP, please try again.')));
+    }
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: blackColor),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Enter the 6-digit code sent to you over ${widget.phoneNumber}',
+              style: GoogleFonts.outfit(
+                fontSize: 24,
+                color: blackColor,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            SizedBox(height: 20),
+
+            Center(
+              child: Pinput(
+                length: 6,
+                controller: _otpController,
+                keyboardType: TextInputType.number,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+              ),
+            ),
+
+            SizedBox(height: 20),
+            GestureDetector(
+              onTap: () {
+                // Handle Resend OTP
+              },
+              child: Text(
+                "Didn't receive the code? Resend",
+                style: GoogleFonts.outfit(
+                  color: blackColor,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ),
+
+            Spacer(),
+            SizedBox(
+              width: double.infinity,
+              height: MediaQuery.of(context).size.height * 0.07,
+              child: PrimaryButton(
+                text: 'Confirm',
+                onPressed: isLoading ? () {} : _verifyOTP,
+              ),
+            ),
+            SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+}
