@@ -8,3 +8,4 @@ const Color grayColor2 = Color(0xFF636363);
 const Color grayColor3 = Color(0xFFD4D4D4);
 const Color borderColor = Color(0xFFDBE4E1);
 const Color whiteColor = Color(0xFFFEFEFE);
+const Color activeborderColor = Color(0xFF969D9A);

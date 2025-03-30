@@ -1,10 +1,11 @@
+import 'package:cab_booking_user/Widgets/common/custom_otp.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cab_booking_user/Widgets/button/primary_button.dart';
 import 'package:cab_booking_user/Widgets/Progress Indicator/circular_progess.dart';
+
 import 'package:cab_booking_user/utils/constants.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:pinput/pinput.dart';
 import 'package:cab_booking_user/screens/user_choice.dart'; // Import UserChoiceScreen
 
 class OTPScreen extends StatefulWidget {
@@ -74,8 +75,6 @@ class _OTPScreenState extends State<OTPScreen> {
       children: [
         Scaffold(
           appBar: AppBar(
-            backgroundColor: Colors.white,
-            elevation: 0,
             leading: IconButton(
               icon: Icon(Icons.arrow_back, color: blackColor),
               onPressed: () {
@@ -98,15 +97,8 @@ class _OTPScreenState extends State<OTPScreen> {
                 ),
                 SizedBox(height: 20),
 
-                Center(
-                  child: Pinput(
-                    length: 6,
-                    controller: _otpController,
-                    keyboardType: TextInputType.number,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                  ),
-                ),
+                // Use CustomOtpInput here
+                Center(child: CustomOtpInput(otpController: _otpController)),
 
                 SizedBox(height: 20),
                 GestureDetector(
