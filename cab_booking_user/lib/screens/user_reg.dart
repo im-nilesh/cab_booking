@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cab_booking_user/providers/auth_provider.dart';
 import 'package:cab_booking_user/utils/constants.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class UserRegistrationScreen extends ConsumerStatefulWidget {
   const UserRegistrationScreen({super.key});
@@ -31,8 +32,6 @@ class _UserRegistrationScreenState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
@@ -46,62 +45,62 @@ class _UserRegistrationScreenState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Title
-            const Text(
+            Text(
               'Basic Information',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
+              style: GoogleFonts.outfit(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: blackColor,
               ),
             ),
             const SizedBox(height: 20),
 
             // First Name and Last Name Fields
-            const Text(
+            Text(
               "What's your name?",
-              style: TextStyle(
-                fontSize: 16,
+              style: GoogleFonts.outfit(
+                fontSize: 20,
                 fontWeight: FontWeight.w500,
-                color: Colors.black,
+                color: blackColor,
               ),
             ),
             const SizedBox(height: 10),
             TextField(
               controller: _firstNameController,
               decoration: InputDecoration(
-                hintText: 'First Name',
-                hintStyle: const TextStyle(color: Colors.grey),
+                hintText: '  First Name',
+                hintStyle: GoogleFonts.outfit(color: hintColor),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide.none,
                 ),
                 filled: true,
-                fillColor: Colors.grey.shade200,
+                fillColor: whiteColor,
               ),
             ),
             const SizedBox(height: 10),
             TextField(
               controller: _lastNameController,
               decoration: InputDecoration(
-                hintText: 'Last Name',
-                hintStyle: const TextStyle(color: Colors.grey),
+                hintText: '  Last Name',
+                hintStyle: GoogleFonts.outfit(color: hintColor),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide.none,
                 ),
                 filled: true,
-                fillColor: Colors.grey.shade200,
+                fillColor: whiteColor,
               ),
             ),
             const SizedBox(height: 20),
 
             // Age Field
-            const Text(
+            Text(
               "What's your age?",
-              style: TextStyle(
-                fontSize: 16,
+              style: GoogleFonts.outfit(
+                fontSize: 20,
                 fontWeight: FontWeight.w500,
-                color: Colors.black,
+                color: blackColor,
               ),
             ),
             const SizedBox(height: 10),
@@ -109,14 +108,14 @@ class _UserRegistrationScreenState
               controller: _ageController,
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
-                hintText: 'Age',
-                hintStyle: const TextStyle(color: Colors.grey),
+                hintText: '  Age',
+                hintStyle: GoogleFonts.outfit(color: hintColor),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide.none,
                 ),
                 filled: true,
-                fillColor: Colors.grey.shade200,
+                fillColor: whiteColor,
               ),
             ),
             const Spacer(),
