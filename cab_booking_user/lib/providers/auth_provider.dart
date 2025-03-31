@@ -146,6 +146,8 @@ class AuthNotifier extends StateNotifier<AuthProvider> {
         'lastName': lastName,
         'age': int.parse(age),
         'createdAt': FieldValue.serverTimestamp(),
+        'role': 'user', // Default role
+        'phone_number': user.phoneNumber,
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
