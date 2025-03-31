@@ -1,0 +1,172 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cab_booking_user/providers/auth_provider.dart';
+import 'package:cab_booking_user/utils/constants.dart';
+
+class UserRegistrationScreen extends ConsumerStatefulWidget {
+  const UserRegistrationScreen({super.key});
+
+  @override
+  ConsumerState<UserRegistrationScreen> createState() =>
+      _UserRegistrationScreenState();
+}
+
+class _UserRegistrationScreenState
+    extends ConsumerState<UserRegistrationScreen> {
+  // Declare the controllers
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _ageController = TextEditingController();
+
+  @override
+  void dispose() {
+    // Dispose the controllers to free up resources
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _ageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Title
+            const Text(
+              'Basic Information',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // First Name and Last Name Fields
+            const Text(
+              "What's your name?",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: Colors.black,
+              ),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: _firstNameController,
+              decoration: InputDecoration(
+                hintText: 'First Name',
+                hintStyle: const TextStyle(color: Colors.grey),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
+                ),
+                filled: true,
+                fillColor: Colors.grey.shade200,
+              ),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: _lastNameController,
+              decoration: InputDecoration(
+                hintText: 'Last Name',
+                hintStyle: const TextStyle(color: Colors.grey),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
+                ),
+                filled: true,
+                fillColor: Colors.grey.shade200,
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // Age Field
+            const Text(
+              "What's your age?",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: Colors.black,
+              ),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: _ageController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                hintText: 'Age',
+                hintStyle: const TextStyle(color: Colors.grey),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
+                ),
+                filled: true,
+                fillColor: Colors.grey.shade200,
+              ),
+            ),
+            const Spacer(),
+
+            // Done Button
+            SizedBox(
+              width: double.infinity,
+              height: MediaQuery.of(context).size.height * 0.07,
+              child: ElevatedButton(
+                onPressed: () {
+                  final firstName = _firstNameController.text.trim();
+                  final lastName = _lastNameController.text.trim();
+                  final age = _ageController.text.trim();
+
+                  if (firstName.isEmpty || lastName.isEmpty || age.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Please fill out all fields'),
+                      ),
+                    );
+                    return;
+                  }
+
+                  // Call the saveUserData method from the provider
+                  ref
+                      .read(authProvider.notifier)
+                      .saveUserData(
+                        context: context,
+                        firstName: firstName,
+                        lastName: lastName,
+                        age: age,
+                      );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: greencolor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  elevation: 0,
+                ),
+                child: const Text(
+                  'Done',
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+}

@@ -9,3 +9,5 @@ const Color grayColor3 = Color(0xFFD4D4D4);
 const Color borderColor = Color(0xFFDBE4E1);
 const Color whiteColor = Color(0xFFFEFEFE);
 const Color activeborderColor = Color(0xFF969D9A);
+const Color dialogTextColor = Color(0xFF6C8A7E);
+const Color dialogBackgroundColor = Color(0xFFE6F2ED);

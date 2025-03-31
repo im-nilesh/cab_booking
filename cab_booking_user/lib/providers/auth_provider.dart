@@ -3,6 +3,7 @@ import 'package:cab_booking_user/screens/user_choice.dart'; // Import UserChoice
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AuthProvider {
   final bool isLoading;
@@ -111,6 +112,52 @@ class AuthNotifier extends StateNotifier<AuthProvider> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Invalid OTP, please try again.')),
       );
+    } finally {
+      state = state.copyWith(isLoading: false);
+    }
+  }
+
+  Future<void> saveUserData({
+    required BuildContext context,
+    required String firstName,
+    required String lastName,
+    required String age,
+  }) async {
+    if (firstName.isEmpty || lastName.isEmpty || age.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill out all fields')),
+      );
+      return;
+    }
+
+    state = state.copyWith(isLoading: true);
+
+    try {
+      // Get the current user's UID
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        throw Exception('No authenticated user found.');
+      }
+      final uid = user.uid;
+
+      // Save data to Firestore with the document ID equal to the user's UID
+      await FirebaseFirestore.instance.collection('users').doc(uid).set({
+        'firstName': firstName,
+        'lastName': lastName,
+        'age': int.parse(age),
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('User data saved successfully!')),
+      );
+
+      // Navigate to the next screen or perform additional actions
+    } catch (e) {
+      print('Error saving user data: $e');
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed to save user data: $e')));
     } finally {
       state = state.copyWith(isLoading: false);
     }
