@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cab_booking_user/providers/auth_provider.dart';
 import 'package:cab_booking_user/utils/constants.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:cab_booking_user/Widgets/button/primary_button.dart'; // Import your custom PrimaryButton
 
 class UserRegistrationScreen extends ConsumerStatefulWidget {
   const UserRegistrationScreen({super.key});
@@ -32,6 +33,8 @@ class _UserRegistrationScreenState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
@@ -120,49 +123,47 @@ class _UserRegistrationScreenState
             ),
             const Spacer(),
 
-            // Done Button
-            SizedBox(
-              width: double.infinity,
-              height: MediaQuery.of(context).size.height * 0.07,
-              child: ElevatedButton(
-                onPressed: () {
-                  final firstName = _firstNameController.text.trim();
-                  final lastName = _lastNameController.text.trim();
-                  final age = _ageController.text.trim();
+            // Done Button using PrimaryButton aligned to the right
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end, // Align to the right
+              children: [
+                SizedBox(
+                  width:
+                      MediaQuery.of(context).size.width * 0.4, // Adjust width
+                  height: MediaQuery.of(context).size.height * 0.07,
+                  child: PrimaryButton(
+                    text: 'Done',
+                    onPressed: () {
+                      final firstName = _firstNameController.text.trim();
+                      final lastName = _lastNameController.text.trim();
+                      final age = _ageController.text.trim();
 
-                  if (firstName.isEmpty || lastName.isEmpty || age.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Please fill out all fields'),
-                      ),
-                    );
-                    return;
-                  }
+                      if (firstName.isEmpty ||
+                          lastName.isEmpty ||
+                          age.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Please fill out all fields'),
+                          ),
+                        );
+                        return;
+                      }
 
-                  // Call the saveUserData method from the provider
-                  ref
-                      .read(authProvider.notifier)
-                      .saveUserData(
-                        context: context,
-                        firstName: firstName,
-                        lastName: lastName,
-                        age: age,
-                      );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: greencolor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                      // Call the saveUserData method from the provider
+                      ref
+                          .read(authProvider.notifier)
+                          .saveUserData(
+                            context: context,
+                            firstName: firstName,
+                            lastName: lastName,
+                            age: age,
+                          );
+                    },
                   ),
-                  elevation: 0,
                 ),
-                child: const Text(
-                  'Done',
-                  style: TextStyle(color: Colors.white, fontSize: 16),
-                ),
-              ),
+              ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 80),
           ],
         ),
       ),
