@@ -1,5 +1,5 @@
 import 'package:cab_booking_user/Widgets/button/icon_button.dart';
-import 'package:cab_booking_user/screens/user_reg.dart';
+import 'package:cab_booking_user/screens/auth/user/user_reg.dart';
 import 'package:flutter/material.dart';
 
 import 'package:cab_booking_user/utils/constants.dart';
@@ -58,7 +58,6 @@ class _UserChoiceState extends State<UserChoice> {
                 icon: Icons.directions_car,
                 onPressed: () {
                   // Navigate to Driver Registration Screen
-                  Navigator.pushNamed(context, '/driver_registration');
                 },
                 backgroundColor: greencolor,
                 textColor: Colors.white,
