@@ -112,7 +112,6 @@ class DriverSelfieInstructionScreen extends StatelessWidget {
                 text: 'Continue',
                 onPressed: () {
                   // Navigate to the next screen
-                  Navigator.pushNamed(context, '/next_screen');
                 },
               ),
             ),

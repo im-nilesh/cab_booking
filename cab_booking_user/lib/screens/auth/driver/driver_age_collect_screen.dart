@@ -15,13 +15,11 @@ class DriverAgeCollectScreen extends StatefulWidget {
 }
 
 class _DriverRegistrationScreen2State extends State<DriverAgeCollectScreen> {
-  final TextEditingController _firstNameController = TextEditingController();
-  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _ageController = TextEditingController();
 
   @override
   void dispose() {
-    _firstNameController.dispose();
-    _lastNameController.dispose();
+    _ageController.dispose();
     super.dispose();
   }
 
@@ -61,7 +59,7 @@ class _DriverRegistrationScreen2State extends State<DriverAgeCollectScreen> {
             const SizedBox(height: 10),
 
             // First Name Field
-            CustomTextField(controller: _firstNameController, hintText: ' Age'),
+            CustomTextField(controller: _ageController, hintText: ' Age'),
             const SizedBox(height: 10),
 
             const Spacer(),
