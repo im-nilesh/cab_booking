@@ -4,6 +4,7 @@ import 'package:cab_booking_user/providers/auth_provider.dart';
 import 'package:cab_booking_user/utils/constants.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cab_booking_user/Widgets/button/primary_button.dart'; // Import your custom PrimaryButton
+import 'package:cab_booking_user/Widgets/textfield/custom_text_field.dart'; // Import your custom TextField
 
 class UserRegistrationScreen extends ConsumerStatefulWidget {
   const UserRegistrationScreen({super.key});
@@ -68,32 +69,14 @@ class _UserRegistrationScreenState
               ),
             ),
             const SizedBox(height: 10),
-            TextField(
+            CustomTextField(
               controller: _firstNameController,
-              decoration: InputDecoration(
-                hintText: '  First Name',
-                hintStyle: GoogleFonts.outfit(color: hintColor),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide.none,
-                ),
-                filled: true,
-                fillColor: whiteColor,
-              ),
+              hintText: 'First Name',
             ),
             const SizedBox(height: 10),
-            TextField(
+            CustomTextField(
               controller: _lastNameController,
-              decoration: InputDecoration(
-                hintText: '  Last Name',
-                hintStyle: GoogleFonts.outfit(color: hintColor),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide.none,
-                ),
-                filled: true,
-                fillColor: whiteColor,
-              ),
+              hintText: 'Last Name',
             ),
             const SizedBox(height: 20),
 
@@ -107,19 +90,10 @@ class _UserRegistrationScreenState
               ),
             ),
             const SizedBox(height: 10),
-            TextField(
+            CustomTextField(
               controller: _ageController,
+              hintText: 'Age',
               keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                hintText: '  Age',
-                hintStyle: GoogleFonts.outfit(color: hintColor),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide.none,
-                ),
-                filled: true,
-                fillColor: whiteColor,
-              ),
             ),
             const Spacer(),
 
