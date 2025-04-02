@@ -1,3 +1,4 @@
+import 'package:cab_booking_user/Widgets/info_box/info_dialog.dart';
 import 'package:cab_booking_user/Widgets/progress_bar/custom_progress_bar';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -64,7 +65,12 @@ class DriverRegistrationStep3 extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.person, size: 80, color: Colors.grey),
+                  Image.asset(
+                    'assets/images/image11.png',
+                    height: 100,
+                    width: 100,
+                    fit: BoxFit.cover,
+                  ),
                   const SizedBox(height: 10),
                   Text(
                     'Please ensure your eyes and ears are clearly visible',
@@ -88,35 +94,16 @@ class DriverRegistrationStep3 extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 30),
 
-            // Information Box
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.green.shade100,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Icon(Icons.info, color: greencolor),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      'The data you share will be encrypted, stored securely, and only used to verify your identity',
-                      style: GoogleFonts.outfit(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        color: blackColor,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
             const Spacer(),
 
+            // Reusable Information Box
+            InfoDialog(
+              icon: const Icon(Icons.info, color: greencolor),
+              text:
+                  'The data you share will be encrypted, stored securely, and only used to verify your identity',
+            ),
+            const SizedBox(height: 30),
             // Continue Button
             SizedBox(
               width: double.infinity,
@@ -129,7 +116,7 @@ class DriverRegistrationStep3 extends StatelessWidget {
                 },
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 30),
           ],
         ),
       ),
