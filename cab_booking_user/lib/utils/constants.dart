@@ -12,3 +12,4 @@ const Color activeborderColor = Color(0xFF969D9A);
 const Color dialogTextColor = Color(0xFF6C8A7E);
 const Color dialogBackgroundColor = Color(0xFFE6F2ED);
 const Color hintColor = Color(0xFF858585);
+const Color containerColor = Color(0xFFEAF4F0);

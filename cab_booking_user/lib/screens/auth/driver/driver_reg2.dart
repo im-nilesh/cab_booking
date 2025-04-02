@@ -51,10 +51,10 @@ class _DriverRegistrationScreen2State extends State<DriverRegistrationScreen2> {
 
             // Title
             Text(
-              "What's your name?",
+              "What's your age?",
               style: GoogleFonts.outfit(
                 fontSize: 20,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w400,
                 color: blackColor,
               ),
             ),
@@ -64,7 +64,7 @@ class _DriverRegistrationScreen2State extends State<DriverRegistrationScreen2> {
             CustomTextField(controller: _firstNameController, hintText: ' Age'),
             const SizedBox(height: 10),
 
-            // Last Name Field
+            const Spacer(),
 
             // Next Button
             Row(

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cab_booking_user/utils/constants.dart';
 import 'package:cab_booking_user/Widgets/button/primary_button.dart';
-import 'package:cab_booking_user/Widgets/textfield/custom_text_field.dart';
 
 class DriverRegistrationStep3 extends StatelessWidget {
   const DriverRegistrationStep3({super.key});
@@ -36,8 +35,8 @@ class DriverRegistrationStep3 extends StatelessWidget {
             Text(
               'Take a Selfie!',
               style: GoogleFonts.outfit(
-                fontSize: 20,
-                fontWeight: FontWeight.w500,
+                fontSize: 24,
+                fontWeight: FontWeight.w600,
                 color: blackColor,
               ),
             ),
@@ -59,7 +58,7 @@ class DriverRegistrationStep3 extends StatelessWidget {
               height: 200,
               width: double.infinity,
               decoration: BoxDecoration(
-                color: Colors.grey.shade100,
+                color: containerColor,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
