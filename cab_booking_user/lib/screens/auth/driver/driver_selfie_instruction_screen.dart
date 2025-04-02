@@ -1,12 +1,12 @@
 import 'package:cab_booking_user/Widgets/info_box/info_dialog.dart';
-import 'package:cab_booking_user/Widgets/progress_bar/custom_progress_bar';
+import 'package:cab_booking_user/Widgets/progress_bar/custom_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cab_booking_user/utils/constants.dart';
 import 'package:cab_booking_user/Widgets/button/primary_button.dart';
 
-class DriverRegistrationStep3 extends StatelessWidget {
-  const DriverRegistrationStep3({super.key});
+class DriverSelfieInstructionScreen extends StatelessWidget {
+  const DriverSelfieInstructionScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +25,7 @@ class DriverRegistrationStep3 extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Progress Bar
-            ProgressBar(
+            CustomProgressBar(
               currentStep: 1,
               totalSteps: 2,
               label: 'Basic Information',

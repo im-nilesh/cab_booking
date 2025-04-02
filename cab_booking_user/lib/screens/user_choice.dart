@@ -1,5 +1,5 @@
 import 'package:cab_booking_user/Widgets/button/icon_button.dart';
-import 'package:cab_booking_user/screens/auth/driver/driver_reg.dart';
+import 'package:cab_booking_user/screens/auth/driver/driver_name_collect_screen.dart';
 import 'package:cab_booking_user/screens/auth/user/user_reg.dart';
 import 'package:flutter/material.dart';
 
@@ -60,7 +60,7 @@ class _UserChoiceState extends State<UserChoice> {
                 onPressed: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) => const DriverRegistrationScreen(),
+                      builder: (context) => const DriverNameCollectScreen(),
                     ),
                   );
                 },

@@ -1,20 +1,20 @@
-import 'package:cab_booking_user/Widgets/progress_bar/custom_progress_bar';
+import 'package:cab_booking_user/Widgets/progress_bar/custom_progress_bar.dart';
 import 'package:cab_booking_user/Widgets/textfield/custom_text_field.dart';
-import 'package:cab_booking_user/screens/auth/driver/driver_reg2.dart';
+import 'package:cab_booking_user/screens/auth/driver/driver_selfie_instruction_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cab_booking_user/utils/constants.dart';
 import 'package:cab_booking_user/Widgets/button/primary_button.dart';
 
-class DriverRegistrationScreen extends StatefulWidget {
-  const DriverRegistrationScreen({super.key});
+class DriverAgeCollectScreen extends StatefulWidget {
+  const DriverAgeCollectScreen({super.key});
 
   @override
-  State<DriverRegistrationScreen> createState() =>
-      _DriverRegistrationScreenState();
+  State<DriverAgeCollectScreen> createState() =>
+      _DriverRegistrationScreen2State();
 }
 
-class _DriverRegistrationScreenState extends State<DriverRegistrationScreen> {
+class _DriverRegistrationScreen2State extends State<DriverAgeCollectScreen> {
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
 
@@ -42,7 +42,7 @@ class _DriverRegistrationScreenState extends State<DriverRegistrationScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Progress Bar
-            ProgressBar(
+            CustomProgressBar(
               currentStep: 1,
               totalSteps: 2,
               label: 'Basic Information',
@@ -51,27 +51,19 @@ class _DriverRegistrationScreenState extends State<DriverRegistrationScreen> {
 
             // Title
             Text(
-              "What's your name?",
+              "What's your age?",
               style: GoogleFonts.outfit(
                 fontSize: 20,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w400,
                 color: blackColor,
               ),
             ),
             const SizedBox(height: 10),
 
             // First Name Field
-            CustomTextField(
-              controller: _firstNameController,
-              hintText: 'First Name',
-            ),
+            CustomTextField(controller: _firstNameController, hintText: ' Age'),
             const SizedBox(height: 10),
 
-            // Last Name Field
-            CustomTextField(
-              controller: _lastNameController,
-              hintText: 'Last Name',
-            ),
             const Spacer(),
 
             // Next Button
@@ -85,10 +77,12 @@ class _DriverRegistrationScreenState extends State<DriverRegistrationScreen> {
                     text: 'Next',
                     onPressed: () {
                       // Navigate to the next screen
-                      Navigator.of(context).push(
+                      Navigator.push(
+                        context,
                         MaterialPageRoute(
                           builder:
-                              (context) => const DriverRegistrationScreen2(),
+                              (context) =>
+                                  const DriverSelfieInstructionScreen(), // Replace with your next screen
                         ),
                       );
                     },
