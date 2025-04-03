@@ -20,7 +20,6 @@ class _DriverCameraScreenState extends State<DriverCameraScreen> {
     try {
       final photoPath = await _cameraKey.currentState?.capturePhoto();
       if (photoPath != null) {
-        // Navigate to the next screen to display the captured photo
         Navigator.of(context).push(
           MaterialPageRoute(
             builder:
@@ -130,42 +129,6 @@ class _DriverCameraScreenState extends State<DriverCameraScreen> {
             ],
           ),
         ],
-      ),
-    );
-  }
-}
-
-class CustomProgressIndicator extends StatelessWidget {
-  final double value;
-  final Color backgroundColor;
-  final Color progressColor;
-  final double height;
-
-  const CustomProgressIndicator({
-    Key? key,
-    required this.value,
-    required this.backgroundColor,
-    required this.progressColor,
-    this.height = 8.0,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: height,
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(12.0),
-      ),
-      child: FractionallySizedBox(
-        widthFactor: value,
-        alignment: Alignment.centerLeft,
-        child: Container(
-          decoration: BoxDecoration(
-            color: progressColor,
-            borderRadius: BorderRadius.circular(12.0),
-          ),
-        ),
       ),
     );
   }
