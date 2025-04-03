@@ -2,6 +2,7 @@ import 'package:cab_booking_user/Widgets/camera/camera_widget.dart';
 import 'package:cab_booking_user/Widgets/progress_bar/custom_progress_bar.dart';
 import 'package:cab_booking_user/utils/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class DriverCameraScreen extends StatelessWidget {
   const DriverCameraScreen({Key? key}) : super(key: key);
@@ -50,16 +51,20 @@ class DriverCameraScreen extends StatelessWidget {
                       label: 'Basic Information',
                     ),
                     const SizedBox(height: 16.0),
-                    const Text(
+                    Text(
                       'Verify Your Identity',
-                      style: TextStyle(
+                      style: GoogleFonts.outfit(
                         fontSize: 24.0,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const Text(
+                    Text(
                       'Put your face in the frame below',
-                      style: TextStyle(fontSize: 14.0, color: Colors.grey),
+                      style: GoogleFonts.outfit(
+                        fontSize: 14.0,
+                        color: grayColor,
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
                   ],
                 ),
