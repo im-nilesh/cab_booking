@@ -65,9 +65,9 @@ class DriverCameraScreen extends StatelessWidget {
                   width: 350.0,
                   height: 450.0,
                   decoration: BoxDecoration(
-                    color: Colors.grey[200],
+                    color: ovalfillColor,
                     borderRadius: BorderRadius.circular(140.0),
-                    border: Border.all(color: Colors.grey, width: 2.0),
+                    border: Border.all(color: cameraovalColor, width: 1.5),
                   ),
                 ),
               ),
@@ -83,7 +83,7 @@ class DriverCameraScreen extends StatelessWidget {
                     width: 80.0,
                     height: 80.0,
                     decoration: BoxDecoration(
-                      color: Colors.green,
+                      color: greencolor,
                       shape: BoxShape.circle,
                       border: Border.all(color: Colors.white, width: 4.0),
                     ),
