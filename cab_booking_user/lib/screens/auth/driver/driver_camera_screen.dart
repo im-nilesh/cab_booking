@@ -3,9 +3,35 @@ import 'package:cab_booking_user/Widgets/progress_bar/custom_progress_bar.dart';
 import 'package:cab_booking_user/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'driver_captured_photo_screen.dart'; // Import the captured photo screen
 
-class DriverCameraScreen extends StatelessWidget {
+class DriverCameraScreen extends StatefulWidget {
   const DriverCameraScreen({Key? key}) : super(key: key);
+
+  @override
+  State<DriverCameraScreen> createState() => _DriverCameraScreenState();
+}
+
+class _DriverCameraScreenState extends State<DriverCameraScreen> {
+  final GlobalKey<CameraWidgetState> _cameraKey =
+      GlobalKey<CameraWidgetState>();
+
+  void _capturePhoto() async {
+    try {
+      final photoPath = await _cameraKey.currentState?.capturePhoto();
+      if (photoPath != null) {
+        // Navigate to the next screen to display the captured photo
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder:
+                (context) => DriverCapturedPhotoScreen(photoPath: photoPath),
+          ),
+        );
+      }
+    } catch (e) {
+      print('Error capturing photo: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,12 +53,7 @@ class DriverCameraScreen extends StatelessWidget {
               child: Container(
                 width: 350.0, // Adjusted width
                 height: 480.0, // Adjusted height
-                child: CameraWidget(
-                  onPhotoCaptured: (String photoPath) {
-                    // Handle the captured photo
-                    print('Photo captured at path: $photoPath');
-                  },
-                ),
+                child: CameraWidget(key: _cameraKey),
               ),
             ),
           ),
@@ -74,9 +95,7 @@ class DriverCameraScreen extends StatelessWidget {
               // Capture Button
               Center(
                 child: GestureDetector(
-                  onTap: () {
-                    // Handle capture button press
-                  },
+                  onTap: _capturePhoto,
                   child: Container(
                     width: 90.0, // Outer circle size
                     height: 90.0,

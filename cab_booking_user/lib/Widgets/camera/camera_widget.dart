@@ -2,16 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 
 class CameraWidget extends StatefulWidget {
-  final Function(String) onPhotoCaptured;
-
-  const CameraWidget({Key? key, required this.onPhotoCaptured})
-    : super(key: key);
+  const CameraWidget({Key? key}) : super(key: key);
 
   @override
-  State<CameraWidget> createState() => _CameraWidgetState();
+  State<CameraWidget> createState() => CameraWidgetState();
 }
 
-class _CameraWidgetState extends State<CameraWidget> {
+class CameraWidgetState extends State<CameraWidget> {
   late CameraController _cameraController;
   late Future<void> _initializeControllerFuture;
 
@@ -30,6 +27,17 @@ class _CameraWidgetState extends State<CameraWidget> {
     await _cameraController.initialize();
   }
 
+  Future<String?> capturePhoto() async {
+    try {
+      await _initializeControllerFuture; // Ensure the camera is initialized
+      final image = await _cameraController.takePicture();
+      return image.path; // Return the photo path
+    } catch (e) {
+      print('Error capturing photo: $e');
+      return null;
+    }
+  }
+
   @override
   void dispose() {
     _cameraController.dispose();
@@ -42,14 +50,7 @@ class _CameraWidgetState extends State<CameraWidget> {
       future: _initializeControllerFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          return FittedBox(
-            fit: BoxFit.cover,
-            child: SizedBox(
-              width: 300.0, // Match the oval width
-              height: 400.0, // Match the oval height
-              child: CameraPreview(_cameraController),
-            ),
-          );
+          return CameraPreview(_cameraController);
         } else {
           return const Center(child: CircularProgressIndicator());
         }
