@@ -1,5 +1,6 @@
 import 'package:cab_booking_user/Widgets/info_box/info_dialog.dart';
 import 'package:cab_booking_user/Widgets/progress_bar/custom_progress_bar.dart';
+import 'package:cab_booking_user/screens/auth/driver/driver_camera_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cab_booking_user/utils/constants.dart';
@@ -111,7 +112,11 @@ class DriverSelfieInstructionScreen extends StatelessWidget {
               child: PrimaryButton(
                 text: 'Continue',
                 onPressed: () {
-                  // Navigate to the next screen
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => DriverCameraScreen(),
+                    ),
+                  );
                 },
               ),
             ),
