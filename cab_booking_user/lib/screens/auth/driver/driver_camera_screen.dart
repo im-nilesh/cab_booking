@@ -62,11 +62,11 @@ class DriverCameraScreen extends StatelessWidget {
               // Oval Face Detection Area
               Center(
                 child: Container(
-                  width: 250.0,
-                  height: 350.0,
+                  width: 350.0,
+                  height: 450.0,
                   decoration: BoxDecoration(
                     color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(200.0),
+                    borderRadius: BorderRadius.circular(140.0),
                     border: Border.all(color: Colors.grey, width: 2.0),
                   ),
                 ),
