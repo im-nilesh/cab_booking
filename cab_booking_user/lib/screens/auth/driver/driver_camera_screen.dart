@@ -1,5 +1,5 @@
 import 'package:cab_booking_user/Widgets/camera/camera_widget.dart';
-import 'package:cab_booking_user/Widgets/progress_bar/custom_progress_bar.dart'; // Import your custom progress bar
+import 'package:cab_booking_user/Widgets/progress_bar/custom_progress_bar.dart';
 import 'package:cab_booking_user/utils/constants.dart';
 import 'package:flutter/material.dart';
 
@@ -19,13 +19,21 @@ class DriverCameraScreen extends StatelessWidget {
       ),
       body: Stack(
         children: [
-          // Custom Camera Widget with required parameter
-          CameraWidget(
-            onPhotoCaptured: (String photoPath) {
-              // Handle the captured photo
-              print('Photo captured at path: $photoPath');
-              // You can navigate to another screen or perform other actions here
-            },
+          // Camera preview inside the rounded rectangular container
+          Center(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(120.0), // Rounded edges
+              child: Container(
+                width: 350.0, // Adjusted width
+                height: 480.0, // Adjusted height
+                child: CameraWidget(
+                  onPhotoCaptured: (String photoPath) {
+                    // Handle the captured photo
+                    print('Photo captured at path: $photoPath');
+                  },
+                ),
+              ),
+            ),
           ),
           // Overlay UI
           Column(
@@ -50,24 +58,10 @@ class DriverCameraScreen extends StatelessWidget {
                       ),
                     ),
                     const Text(
-                      'Put your face in the oval below',
+                      'Put your face in the frame below',
                       style: TextStyle(fontSize: 14.0, color: Colors.grey),
                     ),
                   ],
-                ),
-              ),
-              const Spacer(),
-
-              // Oval Face Detection Area
-              Center(
-                child: Container(
-                  width: 350.0,
-                  height: 450.0,
-                  decoration: BoxDecoration(
-                    color: ovalfillColor,
-                    borderRadius: BorderRadius.circular(140.0),
-                    border: Border.all(color: cameraovalColor, width: 1.5),
-                  ),
                 ),
               ),
               const Spacer(),
@@ -79,12 +73,31 @@ class DriverCameraScreen extends StatelessWidget {
                     // Handle capture button press
                   },
                   child: Container(
-                    width: 80.0,
-                    height: 80.0,
+                    width: 90.0, // Outer circle size
+                    height: 90.0,
                     decoration: BoxDecoration(
-                      color: greencolor,
+                      color: greencolor, // Darker green outer border
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 4.0),
+                    ),
+                    child: Center(
+                      child: Container(
+                        width: 75.0, // Middle circle size
+                        height: 75.0,
+                        decoration: BoxDecoration(
+                          color: Colors.white, // White border
+                          shape: BoxShape.circle,
+                        ),
+                        child: Center(
+                          child: Container(
+                            width: 60.0, // Inner circle size
+                            height: 60.0,
+                            decoration: BoxDecoration(
+                              color: greencolor, // Lighter green center
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),
