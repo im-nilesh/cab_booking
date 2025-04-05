@@ -11,8 +11,10 @@ final driverRegistrationProvider = Provider(
 
 class DriverRegistrationProvider with ChangeNotifier {
   bool _isUploading = false;
+  String? _imageUrl;
 
   bool get isUploading => _isUploading;
+  String? get imageUrl => _imageUrl;
 
   void setUploading(bool value) {
     _isUploading = value;
@@ -104,6 +106,37 @@ class DriverRegistrationProvider with ChangeNotifier {
       ).showSnackBar(SnackBar(content: Text('Failed to upload photo: $e')));
     } finally {
       setUploading(false); // Set uploading state to false
+    }
+  }
+
+  Future<void> fetchProfileImage(BuildContext context) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+
+      if (user == null) {
+        throw Exception("User not authenticated");
+      }
+
+      // Fetch the photo path from Firestore
+      final doc =
+          await FirebaseFirestore.instance
+              .collection('drivers')
+              .doc(user.uid)
+              .get();
+
+      final photoPath = doc.data()?['photo_path'];
+
+      if (photoPath != null) {
+        // Get the download URL from Firebase Storage
+        final url =
+            await FirebaseStorage.instance.ref(photoPath).getDownloadURL();
+        _imageUrl = url;
+        notifyListeners();
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to load profile image: $e')),
+      );
     }
   }
 }

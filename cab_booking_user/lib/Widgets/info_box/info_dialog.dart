@@ -3,11 +3,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:cab_booking_user/utils/constants.dart';
 
 class InfoDialog extends StatelessWidget {
-  final Icon icon;
+  final Icon? icon; // Made icon nullable
   final String text;
 
-  const InfoDialog({Key? key, required this.icon, required this.text})
-    : super(key: key);
+  const InfoDialog({Key? key, this.icon, required this.text}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,15 +19,16 @@ class InfoDialog extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          icon,
-          const SizedBox(width: 10),
+          if (icon != null) ...[icon!, const SizedBox(width: 10)],
           Expanded(
-            child: Text(
-              text,
-              style: GoogleFonts.outfit(
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-                color: dialogTextColor,
+            child: Center(
+              child: Text(
+                text,
+                style: GoogleFonts.outfit(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: dialogTextColor,
+                ),
               ),
             ),
           ),
