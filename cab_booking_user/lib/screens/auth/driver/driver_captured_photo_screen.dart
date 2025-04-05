@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:cab_booking_user/Widgets/button/primary_button.dart';
 import 'package:cab_booking_user/Widgets/progress_bar/custom_progress_bar.dart'; // Use your custom progress bar
+import 'package:cab_booking_user/Widgets/Progress Indicator/circular_progess.dart'; // Import the circular progress indicator
+import 'package:cab_booking_user/screens/auth/driver/driver_profile_created_screen.dart';
 import 'package:cab_booking_user/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -10,6 +12,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cab_booking_user/providers/driver_registration_provider.dart';
 
+// StateProvider to manage loading state
+final loadingProvider = StateProvider<bool>((ref) => false);
+
 class DriverCapturedPhotoScreen extends ConsumerWidget {
   final String photoPath;
 
@@ -18,6 +23,8 @@ class DriverCapturedPhotoScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isLoading = ref.watch(loadingProvider); // Watch loading state
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -27,87 +34,115 @@ class DriverCapturedPhotoScreen extends ConsumerWidget {
           },
         ),
       ),
-      body: Column(
+      body: Stack(
         children: [
-          // Custom Progress Bar
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: CustomProgressBar(
-              currentStep: 1,
-              totalSteps: 2,
-              label: 'Basic Information',
-            ),
-          ),
-          const SizedBox(height: 15.0),
-
-          // Title
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Your Picture',
-                style: GoogleFonts.outfit(
-                  fontSize: 24.0,
-                  fontWeight: FontWeight.w600,
+          Column(
+            children: [
+              // Custom Progress Bar
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: CustomProgressBar(
+                  currentStep: 1,
+                  totalSteps: 2,
+                  label: 'Basic Information',
                 ),
               ),
-            ),
-          ),
-          const SizedBox(height: 40.0),
+              const SizedBox(height: 15.0),
 
-          // Captured Photo
-          Center(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(120.0), // Rounded edges
-              child: Container(
-                width: 350.0, // Adjusted width
-                height: 480.0, // Adjusted height
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade300, width: 2.0),
-                ),
-                child: Image.file(File(photoPath), fit: BoxFit.cover),
-              ),
-            ),
-          ),
-          const SizedBox(height: 40),
-          // Upload and Retake Buttons
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Column(
-              children: [
-                SizedBox(
-                  width: double.infinity,
-                  height: MediaQuery.of(context).size.height * 0.07,
-                  child: PrimaryButton(
-                    text: 'Upload',
-                    onPressed: () async {
-                      await ref
-                          .read(driverRegistrationProvider)
-                          .uploadDriverPhoto(
-                            photoPath: photoPath,
-                            context: context,
-                          );
-                    },
-                  ),
-                ),
-                const SizedBox(height: 16.0),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).pop(); // Go back to retake photo
-                  },
+              // Title
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
                   child: Text(
-                    'Retake',
-                    style: GoogleFonts.inter(
-                      fontSize: 16.0,
-                      color: grayColor,
-                      fontWeight: FontWeight.w500,
+                    'Your Picture',
+                    style: GoogleFonts.outfit(
+                      fontSize: 24.0,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 40.0),
+
+              // Captured Photo
+              Center(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(120.0), // Rounded edges
+                  child: Container(
+                    width: 350.0, // Adjusted width
+                    height: 480.0, // Adjusted height
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.grey.shade300,
+                        width: 2.0,
+                      ),
+                    ),
+                    child: Image.file(File(photoPath), fit: BoxFit.cover),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 40),
+              // Upload and Retake Buttons
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      height: MediaQuery.of(context).size.height * 0.07,
+                      child: PrimaryButton(
+                        text: 'Upload',
+                        onPressed: () async {
+                          ref.read(loadingProvider.notifier).state =
+                              true; // Set loading to true
+                          try {
+                            await ref
+                                .read(driverRegistrationProvider)
+                                .uploadDriverPhoto(
+                                  photoPath: photoPath,
+                                  context: context,
+                                );
+                            // Navigate to ProfileCreatedScreen
+                            Navigator.of(context).pushReplacement(
+                              MaterialPageRoute(
+                                builder:
+                                    (context) =>
+                                        const DriverProfileCreatedScreen(),
+                              ),
+                            );
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Upload failed: $e')),
+                            );
+                          } finally {
+                            ref.read(loadingProvider.notifier).state =
+                                false; // Set loading to false
+                          }
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 16.0),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pop(); // Go back to retake photo
+                      },
+                      child: Text(
+                        'Retake',
+                        style: GoogleFonts.inter(
+                          fontSize: 16.0,
+                          color: grayColor,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
+          // Show Circular Progress Indicator when loading
+          if (isLoading) const CustomProgressIndicator(),
         ],
       ),
     );

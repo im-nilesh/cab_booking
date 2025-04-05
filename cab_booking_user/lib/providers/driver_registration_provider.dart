@@ -10,6 +10,15 @@ final driverRegistrationProvider = Provider(
 );
 
 class DriverRegistrationProvider with ChangeNotifier {
+  bool _isUploading = false;
+
+  bool get isUploading => _isUploading;
+
+  void setUploading(bool value) {
+    _isUploading = value;
+    notifyListeners();
+  }
+
   Future<void> saveDriverDetails({
     required String firstName,
     required String lastName,
@@ -64,6 +73,7 @@ class DriverRegistrationProvider with ChangeNotifier {
     required BuildContext context,
   }) async {
     try {
+      setUploading(true); // Set uploading state to true
       final user = FirebaseAuth.instance.currentUser;
 
       if (user == null) {
@@ -84,17 +94,16 @@ class DriverRegistrationProvider with ChangeNotifier {
       await FirebaseFirestore.instance
           .collection('drivers')
           .doc(user.uid)
-          .update({'photo_path': filePath});
-
+          .update({'photo_path': filePath})
       // Show success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Photo uploaded successfully!')),
-      );
+      ;
     } catch (e) {
       // Show error message
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Failed to upload photo: $e')));
+    } finally {
+      setUploading(false); // Set uploading state to false
     }
   }
 }

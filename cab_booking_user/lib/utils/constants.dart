@@ -15,3 +15,4 @@ const Color hintColor = Color(0xFF858585);
 const Color containerColor = Color(0xFFEAF4F0);
 const Color cameraovalColor = Color(0xFFAEB0AF);
 const Color ovalfillColor = Color(0xFFECECEC);
+const Color avatarborderColor = Color(0xFF0AAF48);
