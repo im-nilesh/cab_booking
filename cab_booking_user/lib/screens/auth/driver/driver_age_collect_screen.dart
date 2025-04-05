@@ -1,24 +1,73 @@
+import 'package:cab_booking_user/providers/driver_registration_provider.dart';
 import 'package:cab_booking_user/Widgets/progress_bar/custom_progress_bar.dart';
 import 'package:cab_booking_user/Widgets/textfield/custom_text_field.dart';
 import 'package:cab_booking_user/screens/auth/driver/driver_selfie_instruction_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cab_booking_user/utils/constants.dart';
 import 'package:cab_booking_user/Widgets/button/primary_button.dart';
 
-class DriverAgeCollectScreen extends StatefulWidget {
+class DriverAgeCollectScreen extends ConsumerStatefulWidget {
   const DriverAgeCollectScreen({super.key});
 
   @override
-  State<DriverAgeCollectScreen> createState() =>
+  ConsumerState<DriverAgeCollectScreen> createState() =>
       _DriverRegistrationScreen2State();
 }
 
-class _DriverRegistrationScreen2State extends State<DriverAgeCollectScreen> {
+class _DriverRegistrationScreen2State
+    extends ConsumerState<DriverAgeCollectScreen> {
   final TextEditingController _ageController = TextEditingController();
+  bool _isButtonEnabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _ageController.addListener(_validateFields);
+  }
+
+  void _validateFields() {
+    setState(() {
+      _isButtonEnabled = _ageController.text.isNotEmpty;
+    });
+  }
+
+  Future<void> _handleNextButtonPress(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
+    try {
+      final age = int.tryParse(_ageController.text);
+      if (age == null || age <= 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please enter a valid age')),
+        );
+        return;
+      }
+
+      // Update the age in Firestore
+      await ref
+          .read(driverRegistrationProvider)
+          .updateDriverAge(age: age, context: context);
+
+      // Navigate to the next screen
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const DriverSelfieInstructionScreen(),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed to update age: $e')));
+    }
+  }
 
   @override
   void dispose() {
+    _ageController.removeListener(_validateFields);
     _ageController.dispose();
     super.dispose();
   }
@@ -41,7 +90,7 @@ class _DriverRegistrationScreen2State extends State<DriverAgeCollectScreen> {
           children: [
             // Progress Bar
             CustomProgressBar(
-              currentStep: 1,
+              currentStep: 2,
               totalSteps: 2,
               label: 'Basic Information',
             ),
@@ -58,10 +107,8 @@ class _DriverRegistrationScreen2State extends State<DriverAgeCollectScreen> {
             ),
             const SizedBox(height: 10),
 
-            // First Name Field
-            CustomTextField(controller: _ageController, hintText: ' Age'),
-            const SizedBox(height: 10),
-
+            // Age Field
+            CustomTextField(controller: _ageController, hintText: 'Age'),
             const Spacer(),
 
             // Next Button
@@ -73,17 +120,12 @@ class _DriverRegistrationScreen2State extends State<DriverAgeCollectScreen> {
                   height: MediaQuery.of(context).size.height * 0.07,
                   child: PrimaryButton(
                     text: 'Next',
-                    onPressed: () {
-                      // Navigate to the next screen
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder:
-                              (context) =>
-                                  const DriverSelfieInstructionScreen(), // Replace with your next screen
-                        ),
-                      );
-                    },
+                    onPressed:
+                        _isButtonEnabled
+                            ? () {
+                              _handleNextButtonPress(context, ref);
+                            }
+                            : () {}, // Disable button if no age is entered
                   ),
                 ),
               ],
