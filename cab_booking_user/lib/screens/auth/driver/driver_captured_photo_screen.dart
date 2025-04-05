@@ -4,15 +4,20 @@ import 'package:cab_booking_user/Widgets/progress_bar/custom_progress_bar.dart';
 import 'package:cab_booking_user/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_storage/firebase_storage.dart'; // Add this import
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cab_booking_user/providers/driver_registration_provider.dart';
 
-class DriverCapturedPhotoScreen extends StatelessWidget {
+class DriverCapturedPhotoScreen extends ConsumerWidget {
   final String photoPath;
 
   const DriverCapturedPhotoScreen({Key? key, required this.photoPath})
     : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -76,8 +81,13 @@ class DriverCapturedPhotoScreen extends StatelessWidget {
                   height: MediaQuery.of(context).size.height * 0.07,
                   child: PrimaryButton(
                     text: 'Upload',
-                    onPressed: () {
-                      // Handle upload action
+                    onPressed: () async {
+                      await ref
+                          .read(driverRegistrationProvider)
+                          .uploadDriverPhoto(
+                            photoPath: photoPath,
+                            context: context,
+                          );
                     },
                   ),
                 ),
