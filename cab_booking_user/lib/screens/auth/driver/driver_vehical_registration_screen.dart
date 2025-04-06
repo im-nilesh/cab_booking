@@ -6,6 +6,7 @@ import 'package:cab_booking_user/Widgets/progress_bar/custom_progress_bar.dart';
 import 'package:cab_booking_user/utils/constants.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cab_booking_user/providers/driver_registration_provider.dart';
+import 'package:cab_booking_user/Widgets/textfield/custom_text_field.dart';
 
 class DriverVehicleRegistrationScreen extends ConsumerWidget {
   const DriverVehicleRegistrationScreen({Key? key}) : super(key: key);
@@ -45,21 +46,9 @@ class DriverVehicleRegistrationScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 40),
-            TextField(
+            CustomTextField(
               controller: vehicleNumberController,
-              decoration: InputDecoration(
-                hintText: 'Enter vehicle number',
-                hintStyle: GoogleFonts.outfit(fontSize: 16, color: hintColor),
-
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                  borderSide: const BorderSide(color: borderColor),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                  borderSide: const BorderSide(color: borderColor),
-                ),
-              ),
+              hintText: 'Enter vehicle number',
             ),
             const Spacer(),
             Row(
@@ -90,13 +79,11 @@ class DriverVehicleRegistrationScreen extends ConsumerWidget {
                             context: context,
                           );
 
-                      // Navigate to the next screen or show success
+                      // Navigate to the next screen
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder:
-                              (context) =>
-                                  const DriverRequiredDocScreen(), // Replace with the next screen
+                          builder: (context) => const DriverRequiredDocScreen(),
                         ),
                       );
                     },
@@ -104,7 +91,7 @@ class DriverVehicleRegistrationScreen extends ConsumerWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 60),
           ],
         ),
       ),
