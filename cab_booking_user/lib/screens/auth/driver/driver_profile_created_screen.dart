@@ -1,3 +1,4 @@
+import 'package:cab_booking_user/screens/auth/driver/driver_vehical_registration_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cab_booking_user/Widgets/button/primary_button.dart';
@@ -115,7 +116,14 @@ class _DriverProfileCreatedScreenState
                   child: PrimaryButton(
                     text: 'Start',
                     onPressed: () {
-                      // Navigate to the next screen
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) =>
+                                  const DriverVehicleRegistrationScreen(),
+                        ),
+                      );
                     },
                   ),
                 ),

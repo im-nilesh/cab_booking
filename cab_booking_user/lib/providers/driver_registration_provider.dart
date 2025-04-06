@@ -139,4 +139,31 @@ class DriverRegistrationProvider with ChangeNotifier {
       );
     }
   }
+
+  Future<void> saveVehicleNumber({
+    required String vehicleNumber,
+    required BuildContext context,
+  }) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+
+      if (user == null) {
+        throw Exception("User not authenticated");
+      }
+
+      // Save the vehicle number to Firestore
+      await FirebaseFirestore.instance
+          .collection('drivers')
+          .doc(user.uid)
+          .update({'vehicle_number': vehicleNumber});
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Vehicle number saved successfully!')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to save vehicle number: $e')),
+      );
+    }
+  }
 }
