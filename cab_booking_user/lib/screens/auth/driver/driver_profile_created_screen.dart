@@ -105,16 +105,21 @@ class _DriverProfileCreatedScreenState
                 ],
               ),
             ),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              height: MediaQuery.of(context).size.height * 0.07,
-              child: PrimaryButton(
-                text: 'Start',
-                onPressed: () {
-                  // Navigate to the next screen
-                },
-              ),
+            const SizedBox(height: 40),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.4,
+                  height: MediaQuery.of(context).size.height * 0.07,
+                  child: PrimaryButton(
+                    text: 'Start',
+                    onPressed: () {
+                      // Navigate to the next screen
+                    },
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 20),
           ],
