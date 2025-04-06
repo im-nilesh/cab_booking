@@ -1,4 +1,4 @@
-import 'package:cab_booking_user/screens/auth/driver/driver_vehical_registration_screen.dart';
+import 'package:cab_booking_user/screens/auth/driver/driver_vehicle_registration_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cab_booking_user/Widgets/button/primary_button.dart';
