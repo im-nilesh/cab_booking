@@ -58,14 +58,6 @@ class DriverRegistrationCompleteScreen extends StatelessWidget {
                 ),
               ),
             ),
-            const Text(
-              'Go to Admin Reject Profile',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-              ),
-            ),
           ],
         ),
       ),
