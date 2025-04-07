@@ -1,71 +1,69 @@
 import 'package:flutter/material.dart';
+import 'package:cab_booking_user/Widgets/progress_bar/custom_progress_bar.dart';
 
-class DriverRequiredDocScreen extends StatefulWidget {
-  const DriverRequiredDocScreen({super.key});
-
-  @override
-  State<DriverRequiredDocScreen> createState() =>
-      _DriverRequiredDocScreenState();
-}
-
-class _DriverRequiredDocScreenState extends State<DriverRequiredDocScreen> {
+class DriverRequiredDocScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text(
-          'Required Documents',
-          style: TextStyle(color: Colors.black),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Please upload the following documents to complete your registration.',
-              style: TextStyle(fontSize: 16),
+            SizedBox(height: 16),
+            CustomProgressBar(
+              currentStep: 2,
+              totalSteps: 2,
+              label: "Vehicle Registration",
             ),
-            const SizedBox(height: 20),
-            // List of required documents
-            Expanded(
-              child: ListView(
-                children: [
-                  ListTile(
-                    leading: const Icon(
-                      Icons.check_circle,
-                      color: Colors.green,
-                    ),
-                    title: const Text('Driver\'s License'),
-                  ),
-                  ListTile(
-                    leading: const Icon(
-                      Icons.check_circle,
-                      color: Colors.green,
-                    ),
-                    title: const Text('Vehicle Registration'),
-                  ),
-                  ListTile(
-                    leading: const Icon(
-                      Icons.check_circle,
-                      color: Colors.green,
-                    ),
-                    title: const Text('Insurance Document'),
-                  ),
-                ],
+            SizedBox(height: 24),
+            Text(
+              "Upload the Required documents",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            ),
+            SizedBox(height: 24),
+            _buildUploadButton("Driving License"),
+            SizedBox(height: 16),
+            _buildUploadButton("Image of vehicle’s number plate"),
+            SizedBox(height: 16),
+            _buildUploadButton("Image of RC"),
+            Spacer(),
+            ElevatedButton(
+              onPressed: null, // Disable the button for now
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.grey[300],
+                foregroundColor: Colors.white,
+                minimumSize: Size(double.infinity, 48),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
+              child: Text("Next"),
             ),
+            SizedBox(height: 16),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildUploadButton(String title) {
+    return OutlinedButton.icon(
+      onPressed: () {
+        // Handle file upload
+      },
+      icon: Icon(Icons.upload_file, color: Colors.green),
+      label: Text(title, style: TextStyle(color: Colors.green)),
+      style: OutlinedButton.styleFrom(
+        side: BorderSide(color: Colors.green),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        minimumSize: Size(double.infinity, 48),
       ),
     );
   }

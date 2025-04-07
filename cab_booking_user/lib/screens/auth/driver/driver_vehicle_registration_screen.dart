@@ -83,7 +83,7 @@ class DriverVehicleRegistrationScreen extends ConsumerWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const DriverRequiredDocScreen(),
+                          builder: (context) => DriverRequiredDocScreen(),
                         ),
                       );
                     },
