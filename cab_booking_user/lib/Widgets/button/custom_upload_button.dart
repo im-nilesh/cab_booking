@@ -22,15 +22,19 @@ class CustomUploadButton extends StatelessWidget {
         children: [
           Text(
             title,
-            style: GoogleFonts.outfit(color: greencolor, fontSize: 16),
+            style: GoogleFonts.outfit(
+              color: greencolor,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ],
       ),
       style: OutlinedButton.styleFrom(
         side: BorderSide(color: uploadButtonborderColor),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        minimumSize: Size(double.infinity, 56), // Adjusted height
-        padding: EdgeInsets.symmetric(horizontal: 16),
+        minimumSize: Size(double.infinity, 65), // Adjusted height
+        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       ),
     );
   }
