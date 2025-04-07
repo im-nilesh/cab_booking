@@ -1,3 +1,4 @@
+import 'package:cab_booking_user/Widgets/button/custom_upload_button.dart';
 import 'package:flutter/material.dart';
 import 'package:cab_booking_user/Widgets/progress_bar/custom_progress_bar.dart';
 
@@ -10,6 +11,8 @@ class DriverRequiredDocScreen extends StatelessWidget {
           icon: Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.of(context).pop(),
         ),
+        backgroundColor: Colors.white,
+        elevation: 0,
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -28,11 +31,26 @@ class DriverRequiredDocScreen extends StatelessWidget {
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
             SizedBox(height: 24),
-            _buildUploadButton("Driving License"),
+            CustomUploadButton(
+              title: "Driving License",
+              onPressed: () {
+                // Handle file upload
+              },
+            ),
             SizedBox(height: 16),
-            _buildUploadButton("Image of vehicle’s number plate"),
+            CustomUploadButton(
+              title: "Image of vehicle’s number plate",
+              onPressed: () {
+                // Handle file upload
+              },
+            ),
             SizedBox(height: 16),
-            _buildUploadButton("Image of RC"),
+            CustomUploadButton(
+              title: "Image of RC",
+              onPressed: () {
+                // Handle file upload
+              },
+            ),
             Spacer(),
             ElevatedButton(
               onPressed: null, // Disable the button for now
@@ -49,21 +67,6 @@ class DriverRequiredDocScreen extends StatelessWidget {
             SizedBox(height: 16),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildUploadButton(String title) {
-    return OutlinedButton.icon(
-      onPressed: () {
-        // Handle file upload
-      },
-      icon: Icon(Icons.upload_file, color: Colors.green),
-      label: Text(title, style: TextStyle(color: Colors.green)),
-      style: OutlinedButton.styleFrom(
-        side: BorderSide(color: Colors.green),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        minimumSize: Size(double.infinity, 48),
       ),
     );
   }
