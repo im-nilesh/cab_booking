@@ -17,17 +17,6 @@ class DriverAdditionalDocScreen extends StatelessWidget {
             Navigator.pop(context);
           },
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              // Handle skip action
-            },
-            child: const Text(
-              'Skip',
-              style: TextStyle(color: Colors.black, fontSize: 16),
-            ),
-          ),
-        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),

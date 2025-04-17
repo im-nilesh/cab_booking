@@ -59,7 +59,7 @@ class _CustomUploadButtonState extends State<CustomUploadButton> {
                   borderRadius: BorderRadius.circular(8),
                   child: Image.file(
                     _pickedFile!,
-                    height: 80,
+                    height: 90,
                     width: 120,
                     fit: BoxFit.cover,
                   ),

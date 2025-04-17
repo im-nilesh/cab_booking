@@ -21,7 +21,6 @@ class DriverRequiredDocScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 16),
             CustomProgressBar(
               currentStep: 2,
               totalSteps: 2,
