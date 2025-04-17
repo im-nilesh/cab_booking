@@ -1,45 +1,86 @@
 import 'package:cab_booking_user/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:file_picker/file_picker.dart';
+import 'dart:io'; // For File
+import 'package:file_picker/file_picker.dart'; // Add this package for file picking
 
-class CustomUploadButton extends StatelessWidget {
+class CustomUploadButton extends StatefulWidget {
   final String title;
-  final VoidCallback? onFileSelected;
+  final VoidCallback onPressed;
 
-  const CustomUploadButton({Key? key, required this.title, this.onFileSelected})
-    : super(key: key);
+  const CustomUploadButton({
+    Key? key,
+    required this.title,
+    required this.onPressed,
+  }) : super(key: key);
+
+  @override
+  _CustomUploadButtonState createState() => _CustomUploadButtonState();
+}
+
+class _CustomUploadButtonState extends State<CustomUploadButton> {
+  File? _pickedFile;
 
   Future<void> _pickFile() async {
-    final result = await FilePicker.platform.pickFiles();
-    if (result != null && onFileSelected != null) {
-      onFileSelected!(); // Trigger the callback when a file is selected
+    final result = await FilePicker.platform.pickFiles(type: FileType.image);
+    if (result != null && result.files.single.path != null) {
+      setState(() {
+        _pickedFile = File(result.files.single.path!);
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return OutlinedButton.icon(
-      onPressed: _pickFile,
-      icon: Icon(Icons.upload_file, color: greencolor),
-      label: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
+    return Container(
+      padding: EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        border: Border.all(color: uploadButtonborderColor),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            title,
-            style: GoogleFonts.outfit(
-              color: greencolor,
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                widget.title,
+                style: GoogleFonts.outfit(
+                  color: greencolor,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 8),
+              if (_pickedFile !=
+                  null) // Only show the image if a file is selected
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.file(
+                    _pickedFile!,
+                    height: 80,
+                    width: 120,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+            ],
+          ),
+          TextButton(
+            onPressed: () {
+              _pickFile();
+              widget.onPressed();
+            },
+            child: Text(
+              _pickedFile != null ? "Re-upload" : "Upload",
+              style: GoogleFonts.outfit(
+                color: greencolor,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
         ],
-      ),
-      style: OutlinedButton.styleFrom(
-        side: BorderSide(color: uploadButtonborderColor),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        minimumSize: Size(double.infinity, 65), // Adjusted height
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       ),
     );
   }

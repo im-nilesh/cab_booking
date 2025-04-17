@@ -51,14 +51,14 @@ class DriverAdditionalDocScreen extends StatelessWidget {
             const SizedBox(height: 20),
             CustomUploadButton(
               title: 'Insurance Copy',
-              onFileSelected: () {
+              onPressed: () {
                 // Handle upload action for Insurance Copy
               },
             ),
             const SizedBox(height: 20),
             CustomUploadButton(
               title: 'Pollution Check Certificate',
-              onFileSelected: () {
+              onPressed: () {
                 // Handle upload action for Pollution Check Certificate
               },
             ),

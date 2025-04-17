@@ -39,26 +39,24 @@ class DriverRequiredDocScreen extends StatelessWidget {
             SizedBox(height: 24),
             CustomUploadButton(
               title: "Driving License",
-              onFileSelected: () {
-                print("File selected!");
+              onPressed: () {
+                // Handle file upload
               },
             ),
             SizedBox(height: 16),
             CustomUploadButton(
               title: "Image of vehicle’s number plate",
-              onFileSelected: () {
-                print("File selected!");
+              onPressed: () {
+                // Handle file upload
               },
             ),
             SizedBox(height: 16),
             CustomUploadButton(
               title: "Image of RC",
-              onFileSelected: () {
-                print("File selected!");
+              onPressed: () {
+                // Handle file upload
               },
             ),
-            SizedBox(height: 16),
-
             const Spacer(),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
