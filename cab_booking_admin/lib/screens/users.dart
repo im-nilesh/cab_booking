@@ -1,3 +1,4 @@
+import 'package:cab_booking_admin/widgets/custom_table.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -67,7 +68,7 @@ class _UsersPageState extends State<UsersPage> {
                             'firstName': data['firstName'] ?? '',
                             'lastName': data['lastName'] ?? '',
                             'phone': data['phone_number'] ?? '',
-                            'age': data['age'].toString() ?? '',
+                            'age': data['age'].toString(),
                             'created':
                                 data['createdAt'] != null
                                     ? (data['createdAt'] as Timestamp)
@@ -94,175 +95,89 @@ class _UsersPageState extends State<UsersPage> {
                         })
                         .toList();
 
-                return Align(
-                  alignment: Alignment.topCenter,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 1200),
-                      child: DataTable(
-                        headingRowHeight: 50,
-                        dataRowHeight: 60,
-                        columnSpacing: 30,
-                        dividerThickness: 0.6,
-                        headingRowColor: MaterialStateProperty.all(
-                          Colors.green.withOpacity(0.1),
-                        ),
-                        dataRowColor: MaterialStateProperty.resolveWith(
-                          (states) =>
-                              states.contains(MaterialState.selected)
-                                  ? Colors.green.withOpacity(0.05)
-                                  : Colors.transparent,
-                        ),
-                        border: TableBorder(
-                          horizontalInside: BorderSide(
-                            color: Colors.grey.withOpacity(0.2),
-                            width: 0.7,
-                          ),
-                        ),
-                        columns: const [
-                          DataColumn(
-                            label: Text(
-                              'First Name',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ),
-                          DataColumn(
-                            label: Text(
-                              'Last Name',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ),
-                          DataColumn(
-                            label: Text(
-                              'Phone Number',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ),
-                          DataColumn(
-                            label: Text(
-                              'Created Date',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ),
-                          DataColumn(
-                            label: Text(
-                              'Modified Date',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ),
-                          DataColumn(
-                            label: Text(
-                              'Status',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ),
-                          DataColumn(
-                            label: Text(
-                              'Actions',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ),
-                        ],
-                        rows:
-                            users.asMap().entries.map((entry) {
-                              final index = entry.key;
-                              final user = entry.value;
+                return CustomDataTable(
+                  columns: const [
+                    DataColumn(label: Text('First Name')),
+                    DataColumn(label: Text('Last Name')),
+                    DataColumn(label: Text('Phone Number')),
+                    DataColumn(label: Text('Created Date')),
+                    DataColumn(label: Text('Modified Date')),
+                    DataColumn(label: Text('Status')),
+                    DataColumn(label: Text('Actions')),
+                  ],
+                  rows:
+                      users.asMap().entries.map((entry) {
+                        final index = entry.key;
+                        final user = entry.value;
 
-                              return DataRow(
-                                color: MaterialStateProperty.all(
-                                  index.isEven
-                                      ? Colors.grey.withOpacity(0.05)
-                                      : Colors.transparent,
-                                ),
-                                cells: [
-                                  DataCell(
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          user['firstName']!,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          user['age'],
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.grey,
-                                          ),
-                                        ),
-                                      ],
+                        return DataRow(
+                          color: MaterialStateProperty.all(
+                            index.isEven
+                                ? Colors.grey.withOpacity(0.05)
+                                : Colors.transparent,
+                          ),
+                          cells: [
+                            DataCell(
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    user['firstName']!,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w500,
                                     ),
                                   ),
-                                  DataCell(Text(user['lastName']!)),
-                                  DataCell(Text(user['phone']!)),
-                                  DataCell(Text(user['created']!)),
-                                  DataCell(Text(user['modified']!)),
-                                  DataCell(
-                                    Text(
-                                      user['status']!,
-                                      style: TextStyle(
-                                        color:
-                                            user['status'] == "active"
-                                                ? Colors.green
-                                                : Colors.red,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ),
-                                  DataCell(
-                                    Row(
-                                      children: [
-                                        IconButton(
-                                          icon: const Icon(
-                                            Icons.edit,
-                                            color: Colors.green,
-                                          ),
-                                          onPressed: () {},
-                                        ),
-                                        IconButton(
-                                          icon: const Icon(
-                                            Icons.delete,
-                                            color: Colors.red,
-                                          ),
-                                          onPressed: () {},
-                                        ),
-                                      ],
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    user['age'],
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey,
                                     ),
                                   ),
                                 ],
-                              );
-                            }).toList(),
-                      ),
-                    ),
-                  ),
+                              ),
+                            ),
+                            DataCell(Text(user['lastName']!)),
+                            DataCell(Text(user['phone']!)),
+                            DataCell(Text(user['created']!)),
+                            DataCell(Text(user['modified']!)),
+                            DataCell(
+                              Text(
+                                user['status']!,
+                                style: TextStyle(
+                                  color:
+                                      user['status'] == "active"
+                                          ? Colors.green
+                                          : Colors.red,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            DataCell(
+                              Row(
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(
+                                      Icons.edit,
+                                      color: Colors.green,
+                                    ),
+                                    onPressed: () {},
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(
+                                      Icons.delete,
+                                      color: Colors.red,
+                                    ),
+                                    onPressed: () {},
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        );
+                      }).toList(),
                 );
               },
             ),
