@@ -18,30 +18,18 @@ class CustomTextField extends StatelessWidget {
     return TextField(
       controller: controller,
       obscureText: obscureText,
-      style: const TextStyle(color: blackColor), // ✅ text color
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: const TextStyle(color: hintColor), // ✅ hint color
+        hintStyle: const TextStyle(color: hintColor),
         filled: true,
-        fillColor: containerColor, // ✅ background
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 14,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: borderColor), // ✅ border
-        ),
+        fillColor: whiteColor,
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
           borderSide: const BorderSide(color: borderColor),
+          borderRadius: BorderRadius.circular(8),
         ),
         focusedBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: greencolor, width: 1.5),
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(
-            color: greencolor,
-            width: 1.8,
-          ), // ✅ active green border
         ),
       ),
     );
