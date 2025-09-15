@@ -7,11 +7,13 @@ import 'package:file_picker/file_picker.dart'; // Add this package for file pick
 class CustomUploadButton extends StatefulWidget {
   final String title;
   final VoidCallback onPressed;
+  final Function(File?)? onFilePicked; // <-- Add this
 
   const CustomUploadButton({
     Key? key,
     required this.title,
     required this.onPressed,
+    this.onFilePicked, // <-- Add this
   }) : super(key: key);
 
   @override
@@ -27,6 +29,9 @@ class _CustomUploadButtonState extends State<CustomUploadButton> {
       setState(() {
         _pickedFile = File(result.files.single.path!);
       });
+      if (widget.onFilePicked != null) {
+        widget.onFilePicked!(_pickedFile); // <-- Call the callback
+      }
     }
   }
 

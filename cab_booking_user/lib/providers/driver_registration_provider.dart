@@ -166,4 +166,53 @@ class DriverRegistrationProvider with ChangeNotifier {
       );
     }
   }
+
+  Future<void> uploadDriverDocuments({
+    required File? drivingLicenseFile,
+    required File? vehicleNumberPlateFile,
+    required File? rcFile,
+    required BuildContext context,
+  }) async {
+    try {
+      setUploading(true);
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) throw Exception("User not authenticated");
+
+      final storage = FirebaseStorage.instance;
+      final firestore = FirebaseFirestore.instance;
+      final docRef = firestore.collection('drivers').doc(user.uid);
+
+      Map<String, String> docPaths = {};
+
+      if (drivingLicenseFile != null) {
+        final dlPath = 'driver_docs/${user.uid}/driving_license.jpg';
+        await storage.ref(dlPath).putFile(drivingLicenseFile);
+        docPaths['driving_license_path'] = dlPath;
+      }
+      if (vehicleNumberPlateFile != null) {
+        final npPath = 'driver_docs/${user.uid}/number_plate.jpg';
+        await storage.ref(npPath).putFile(vehicleNumberPlateFile);
+        docPaths['number_plate_path'] = npPath;
+      }
+      if (rcFile != null) {
+        final rcPath = 'driver_docs/${user.uid}/rc.jpg';
+        await storage.ref(rcPath).putFile(rcFile);
+        docPaths['rc_path'] = rcPath;
+      }
+
+      if (docPaths.isNotEmpty) {
+        await docRef.update(docPaths);
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Documents uploaded successfully!')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed to upload documents: $e')));
+    } finally {
+      setUploading(false);
+    }
+  }
 }

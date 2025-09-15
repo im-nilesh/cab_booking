@@ -1,63 +1,6 @@
-17/04/2025
+15-09-2025
 
-1. Custom Resusable Upload button Edit - done
-2. Add Hidden Image Widget to Custom Resusable Upload button - done
-
-07/04/2025
-
-1. Upload Required Document Screen - done
-2. Upload Addition Document Screen - done
-3. Registration Complete Screen - done
-4. Admin Profile Rejected Screen - done
-
-06/04/2025
-
-1. getting user profile phot and displaying - done
-2. Storing Vehicle number in firebase collection - done
-
-05/04/2025
-
-1. Storing drivername, age, and profile photo in firebase collections - done
-
-03/04/2025
-
-1. Driver Photo Capture Screen - done
-
-02/04/2025
-
-1. On User Reg. Screen Make fields component reusable - done
-2. Driver Name Collect Screen - done
-3. Driver Age Collect Screen - done
-4. Driver Selfie Instruction Screen - done
-
-31/03/2025
-
-1. Firebase Storage Integration - done
-2. User selection Screen ui - done
-3. User Registration ui - done
-4. User Registration backend - done
-
-30/03/2025
-
-1. Firebase Phone configuration - done
-2. Firebase Flutter phone integration - done
-3. otp Screen - done
-4. Basic User Screen - done
-
-29/03/2025
-
-1. Slider Button Animation - done
-2. Welcome screen - done
-3. Phone Number Screen - done
-
-28/03/2025
-
-1. Slider - done
-
-27/03/2025
-
-1. Flutter project setup - done
-2. firebase project setup - done
-3. Flutter firebase integration - done
-4. Flutter user splash screen - done
-5. Flutter setup google fonts, riverpod - done
+1. save driver documents in firebase
+2. create admin login panel with email id and passowrd
+3. In admin panel create left navigation menu users, drivers, booked rides, failed rides, locations
+4. Show user list in users screen and driver list in driver screen
