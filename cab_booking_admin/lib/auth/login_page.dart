@@ -1,9 +1,8 @@
 import 'package:cab_booking_admin/auth/auth_provider.dart';
-import 'package:cab_booking_admin/screens/admin_home.dart';
-import 'package:cab_booking_admin/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import '../screens/admin_home.dart';
+import '../utils/constants.dart';
 import '../widgets/custom_textfield.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
@@ -70,6 +69,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         ),
                       ),
                       onPressed: () async {
+                        setState(() => errorMessage = null);
+
                         try {
                           final user = await ref.read(
                             loginProvider({
@@ -78,22 +79,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             }).future,
                           );
 
-                          if (user.email == 'admin@gmail.com') {
-                            // ✅ Only allow admin
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const AdminHome(),
-                              ),
-                            );
-                          } else {
-                            await FirebaseAuth.instance.signOut();
-                            setState(
-                              () =>
-                                  errorMessage =
-                                      'You are not authorized to access the admin panel.',
-                            );
-                          }
+                          // ✅ Login successful
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const AdminHome(),
+                            ),
+                          );
                         } catch (e) {
                           setState(() => errorMessage = e.toString());
                         }

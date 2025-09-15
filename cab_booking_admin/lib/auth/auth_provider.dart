@@ -1,12 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-/// FirebaseAuth instance provider
+/// FirebaseAuth instance
 final firebaseAuthProvider = Provider<FirebaseAuth>((ref) {
   return FirebaseAuth.instance;
 });
 
-/// Stream of auth state (user signed in/out)
+/// Auth state stream
 final authStateProvider = StreamProvider<User?>((ref) {
   return ref.watch(firebaseAuthProvider).authStateChanges();
 });
@@ -24,7 +24,7 @@ final loginProvider = FutureProvider.family<User, Map<String, String>>((
   return userCredential.user!;
 });
 
-/// Logout provider
+/// Logout
 final logoutProvider = Provider<Future<void> Function()>((ref) {
   return () async {
     await ref.read(firebaseAuthProvider).signOut();
