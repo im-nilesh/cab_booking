@@ -20,16 +20,19 @@ class _DriversPageState extends State<DriversPage> {
     });
   }
 
-  void _showDocumentDialog(
+  Future<void> _showDocumentDialog(
     BuildContext context,
     String storagePath,
     String docName,
   ) async {
     String? imageUrl;
+
     try {
       imageUrl =
           await FirebaseStorage.instance.ref(storagePath).getDownloadURL();
+      debugPrint('Download URL: $imageUrl');
     } catch (e) {
+      debugPrint('Failed to load image from $storagePath: $e');
       imageUrl = null;
     }
 
@@ -44,16 +47,43 @@ class _DriversPageState extends State<DriversPage> {
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
                     docName,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
                   ),
                 ),
                 if (imageUrl != null)
-                  Image.network(imageUrl, fit: BoxFit.contain)
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: SizedBox(
+                      width: 300, // Set desired width
+                      height: 400, // Set desired height
+                      child: Image.network(
+                        imageUrl,
+                        fit: BoxFit.contain,
+                        loadingBuilder: (context, child, progress) {
+                          if (progress == null) return child;
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        },
+                        errorBuilder:
+                            (_, __, ___) => const Center(
+                              child: Text('Unable to load image.'),
+                            ),
+                      ),
+                    ),
+                  )
                 else
                   const Padding(
                     padding: EdgeInsets.all(16.0),
                     child: Text('Unable to load image.'),
                   ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Close'),
+                ),
               ],
             ),
           ),
@@ -108,9 +138,9 @@ class _DriversPageState extends State<DriversPage> {
                           return {
                             'firstName': data['firstName'] ?? '',
                             'lastName': data['lastName'] ?? '',
-                            'phone': data['phone'] ?? '',
+                            'phone': data['phone_number'] ?? '',
                             'age': data['age']?.toString() ?? '',
-                            'vehicleNumber': data['vehicleNumber'] ?? '',
+                            'vehicleNumber': data['vehicle_number'] ?? '',
                             'status': data['status'] ?? 'active',
                             'rc_path': data['rc_path'],
                             'pollution_certificate_path':
@@ -198,9 +228,9 @@ class _DriversPageState extends State<DriversPage> {
                                     docLabels.entries.map((entry) {
                                       final docKey = entry.key;
                                       final docLabel = entry.value;
-                                      final docUrl = driver[docKey];
-                                      if (docUrl != null &&
-                                          docUrl.toString().isNotEmpty) {
+                                      final docPath = driver[docKey];
+                                      if (docPath != null &&
+                                          docPath.toString().isNotEmpty) {
                                         return Padding(
                                           padding: const EdgeInsets.symmetric(
                                             horizontal: 2.0,
@@ -211,7 +241,7 @@ class _DriversPageState extends State<DriversPage> {
                                               onTap:
                                                   () => _showDocumentDialog(
                                                     context,
-                                                    docUrl,
+                                                    docPath,
                                                     docLabel,
                                                   ),
                                               child: const Icon(
@@ -223,7 +253,6 @@ class _DriversPageState extends State<DriversPage> {
                                           ),
                                         );
                                       } else {
-                                        // Show a placeholder for missing docs to keep icon count/spacing consistent
                                         return const SizedBox(width: 26);
                                       }
                                     }).toList(),
