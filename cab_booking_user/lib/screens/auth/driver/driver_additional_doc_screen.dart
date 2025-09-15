@@ -1,11 +1,26 @@
+import 'dart:io';
+import 'package:cab_booking_user/Widgets/Progress%20Indicator/circular_progess.dart';
 import 'package:cab_booking_user/screens/auth/driver/driver_registration_complete_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:cab_booking_user/Widgets/button/custom_upload_button.dart';
 import 'package:cab_booking_user/Widgets/button/primary_button.dart';
 import 'package:cab_booking_user/Widgets/progress_bar/custom_progress_bar.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cab_booking_user/providers/driver_registration_provider.dart';
 
-class DriverAdditionalDocScreen extends StatelessWidget {
+class DriverAdditionalDocScreen extends ConsumerStatefulWidget {
   const DriverAdditionalDocScreen({Key? key}) : super(key: key);
+
+  @override
+  ConsumerState<DriverAdditionalDocScreen> createState() =>
+      _DriverAdditionalDocScreenState();
+}
+
+class _DriverAdditionalDocScreenState
+    extends ConsumerState<DriverAdditionalDocScreen> {
+  File? insuranceCopyFile;
+  File? pollutionCertificateFile;
+  bool isUploading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -40,15 +55,21 @@ class DriverAdditionalDocScreen extends StatelessWidget {
             const SizedBox(height: 20),
             CustomUploadButton(
               title: 'Insurance Copy',
-              onPressed: () {
-                // Handle upload action for Insurance Copy
+              onPressed: () {},
+              onFilePicked: (file) {
+                setState(() {
+                  insuranceCopyFile = file;
+                });
               },
             ),
             const SizedBox(height: 20),
             CustomUploadButton(
               title: 'Pollution Check Certificate',
-              onPressed: () {
-                // Handle upload action for Pollution Check Certificate
+              onPressed: () {},
+              onFilePicked: (file) {
+                setState(() {
+                  pollutionCertificateFile = file;
+                });
               },
             ),
             const Spacer(),
@@ -60,7 +81,20 @@ class DriverAdditionalDocScreen extends StatelessWidget {
                   height: MediaQuery.of(context).size.height * 0.07,
                   child: PrimaryButton(
                     text: 'Next',
-                    onPressed: () {
+                    onPressed: () async {
+                      setState(() {
+                        isUploading = true;
+                      });
+                      await ref
+                          .read(driverRegistrationProvider)
+                          .uploadAdditionalDriverDocuments(
+                            insuranceCopyFile: insuranceCopyFile,
+                            pollutionCertificateFile: pollutionCertificateFile,
+                            context: context,
+                          );
+                      setState(() {
+                        isUploading = false;
+                      });
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder:
@@ -73,6 +107,7 @@ class DriverAdditionalDocScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 20),
+            if (isUploading) const CustomProgressIndicator(),
           ],
         ),
       ),

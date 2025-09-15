@@ -215,4 +215,50 @@ class DriverRegistrationProvider with ChangeNotifier {
       setUploading(false);
     }
   }
+
+  Future<void> uploadAdditionalDriverDocuments({
+    required File? insuranceCopyFile,
+    required File? pollutionCertificateFile,
+    required BuildContext context,
+  }) async {
+    try {
+      setUploading(true);
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) throw Exception("User not authenticated");
+
+      final storage = FirebaseStorage.instance;
+      final firestore = FirebaseFirestore.instance;
+      final docRef = firestore.collection('drivers').doc(user.uid);
+
+      Map<String, String> docPaths = {};
+
+      if (insuranceCopyFile != null) {
+        final insurancePath = 'driver_docs/${user.uid}/insurance_copy.jpg';
+        await storage.ref(insurancePath).putFile(insuranceCopyFile);
+        docPaths['insurance_copy_path'] = insurancePath;
+      }
+      if (pollutionCertificateFile != null) {
+        final pollutionPath =
+            'driver_docs/${user.uid}/pollution_certificate.jpg';
+        await storage.ref(pollutionPath).putFile(pollutionCertificateFile);
+        docPaths['pollution_certificate_path'] = pollutionPath;
+      }
+
+      if (docPaths.isNotEmpty) {
+        await docRef.update(docPaths);
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Additional documents uploaded successfully!'),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to upload additional documents: $e')),
+      );
+    } finally {
+      setUploading(false);
+    }
+  }
 }
