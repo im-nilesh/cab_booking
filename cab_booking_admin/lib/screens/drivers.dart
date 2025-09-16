@@ -61,10 +61,20 @@ class DriversPage extends ConsumerWidget {
     );
   }
 
+  // Helper to update registration_status in Firestore
+  Future<void> _updateRegistrationStatus(String driverId, String status) async {
+    await FirebaseFirestore.instance.collection('drivers').doc(driverId).update(
+      {'registration_status': status},
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final filteredDrivers = ref.watch(filteredDriversProvider);
     final driversAsyncValue = ref.watch(driversStreamProvider);
+    final updateRegistrationStatus = ref.read(
+      updateDriverRegistrationStatusProvider,
+    );
 
     return Padding(
       padding: const EdgeInsets.all(20),
@@ -175,20 +185,51 @@ class DriversPage extends ConsumerWidget {
                             DataCell(
                               Row(
                                 children: [
-                                  IconButton(
-                                    icon: const Icon(
-                                      Icons.edit,
-                                      color: Colors.green,
+                                  if ((driver['registration_status'] ??
+                                          'incomplete') ==
+                                      'incomplete') ...[
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.close,
+                                        color: Colors.red,
+                                      ),
+                                      tooltip: 'Reject Registration',
+                                      onPressed: () async {
+                                        await updateRegistrationStatus(
+                                          driver['id'],
+                                          'rejected',
+                                        );
+                                      },
                                     ),
-                                    onPressed: () {},
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(
-                                      Icons.delete,
-                                      color: Colors.red,
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.check,
+                                        color: Colors.green,
+                                      ),
+                                      tooltip: 'Approve Registration',
+                                      onPressed: () async {
+                                        await updateRegistrationStatus(
+                                          driver['id'],
+                                          'complete',
+                                        );
+                                      },
                                     ),
-                                    onPressed: () {},
-                                  ),
+                                  ] else ...[
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.edit,
+                                        color: Colors.green,
+                                      ),
+                                      onPressed: () {},
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.delete,
+                                        color: Colors.red,
+                                      ),
+                                      onPressed: () {},
+                                    ),
+                                  ],
                                 ],
                               ),
                             ),

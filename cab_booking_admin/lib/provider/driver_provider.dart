@@ -27,6 +27,9 @@ final filteredDriversProvider = Provider<List<Map<String, dynamic>>>((ref) {
               'age': data['age']?.toString() ?? '',
               'vehicleNumber': data['vehicle_number'] ?? '',
               'status': data['status'] ?? 'active',
+              'registration_status':
+                  data['registration_status'] ??
+                  'incomplete', // <-- Add this line
               'docs': {
                 'rc_path': data['rc_path'],
                 'pollution_certificate_path':
@@ -53,3 +56,13 @@ final filteredDriversProvider = Provider<List<Map<String, dynamic>>>((ref) {
     error: (e, stack) => [],
   );
 });
+
+final updateDriverRegistrationStatusProvider =
+    Provider<Future<void> Function(String, String)>((ref) {
+      return (String driverId, String status) async {
+        await FirebaseFirestore.instance
+            .collection('drivers')
+            .doc(driverId)
+            .update({'registration_status': status});
+      };
+    });
