@@ -1,4 +1,4 @@
-import 'package:cab_booking_admin/auth/driver_provider.dart';
+import 'package:cab_booking_admin/provider/driver_provider.dart';
 import 'package:cab_booking_admin/components/dialog_document.dart';
 import 'package:cab_booking_admin/widgets/custom_table.dart';
 import 'package:flutter/material.dart';

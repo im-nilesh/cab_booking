@@ -1,4 +1,4 @@
-import 'package:cab_booking_admin/auth/location_provider.dart';
+import 'package:cab_booking_admin/provider/location_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../utils/constants.dart';

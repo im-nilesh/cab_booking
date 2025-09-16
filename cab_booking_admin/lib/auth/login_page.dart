@@ -1,4 +1,4 @@
-import 'package:cab_booking_admin/auth/auth_provider.dart';
+import 'package:cab_booking_admin/provider/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../screens/admin_home.dart';

@@ -1,4 +1,4 @@
-import 'package:cab_booking_admin/auth/location_provider.dart';
+import 'package:cab_booking_admin/provider/location_provider.dart';
 import 'package:cab_booking_admin/widgets/add_location.dart';
 import 'package:cab_booking_admin/widgets/edit_dialog_box.dart';
 import 'package:flutter/material.dart';
