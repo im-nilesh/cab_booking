@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cab_booking_admin/widgets/custom_admin_sidebar.dart';
 import 'package:cab_booking_admin/screens/users.dart';
 import 'package:cab_booking_admin/screens/drivers.dart';
+import 'package:cab_booking_admin/screens/location.dart';
 
 class AdminHome extends StatefulWidget {
   const AdminHome({super.key});
@@ -20,7 +21,7 @@ class _AdminHomeState extends State<AdminHome> {
     Center(child: Text("Failed Rides Page")), // 3: Failed Rides
     Center(child: Text("Pooled Users Page")), // 4: Pooled Users
     Center(child: Text("Pooling Rides Page")), // 5: Pooling Rides
-    Center(child: Text("Locations Page")), // 6: Locations
+    LocationScreen(), // 6: Locations
   ];
 
   @override

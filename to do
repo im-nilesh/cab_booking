@@ -1,6 +1,13 @@
+16-09-2025
+
+1. Add location on admin panel - done
+2. Show locations on admin panel
+3. Create bottom navigation for user
+4. Create bottom navigation for driver
+
 15-09-2025
 
 1. save driver documents in firebase - done
 2. create admin login panel with email id and passowrd - done
-3. In admin panel create left navigation menu users, drivers, booked rides, failed rides, locations
-4. Show user list in users screen and driver list in driver screen
+3. In admin panel create left navigation menu users, drivers, booked rides, failed rides, locations - done
+4. Show user list in users screen and driver list in driver screen - done
