@@ -1,5 +1,3 @@
-// lib/providers/location_provider.dart
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -33,8 +31,7 @@ final filteredLocationsProvider = Provider<List<Map<String, dynamic>>>((ref) {
               'advancePrice': data['advancePrice'] ?? '',
               'pricesCombined':
                   'S: ${prices['sedan'] ?? ''}, H: ${prices['hatchback'] ?? ''}, E: ${prices['suvErtiga'] ?? ''}, X: ${prices['xylo'] ?? ''}',
-              'originalData':
-                  data, // Pass the original data for the edit dialog
+              'originalData': data,
             };
           }).toList();
 
@@ -55,3 +52,55 @@ final filteredLocationsProvider = Provider<List<Map<String, dynamic>>>((ref) {
     error: (e, stack) => [],
   );
 });
+
+// Provider for handling location-related actions (add, update, delete)
+final locationActionsProvider = Provider<LocationActions>((ref) {
+  return LocationActions();
+});
+
+class LocationActions {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  Future<void> addLocation({
+    required String cityOne,
+    required String cityTwo,
+    required List<String> cityOneAreas,
+    required List<String> cityTwoAreas,
+    required String advancePrice,
+    required Map<String, dynamic> prices,
+  }) async {
+    await _firestore.collection('locations').add({
+      'cityOne': cityOne,
+      'cityTwo': cityTwo,
+      'cityOneAreas': cityOneAreas,
+      'cityTwoAreas': cityTwoAreas,
+      'advancePrice': advancePrice,
+      'prices': prices,
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Future<void> updateLocation({
+    required String documentId,
+    required String cityOne,
+    required String cityTwo,
+    required List<String> cityOneAreas,
+    required List<String> cityTwoAreas,
+    required String advancePrice,
+    required Map<String, dynamic> prices,
+  }) async {
+    await _firestore.collection('locations').doc(documentId).update({
+      'cityOne': cityOne,
+      'cityTwo': cityTwo,
+      'cityOneAreas': cityOneAreas,
+      'cityTwoAreas': cityTwoAreas,
+      'advancePrice': advancePrice,
+      'prices': prices,
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Future<void> deleteLocation({required String documentId}) async {
+    await _firestore.collection('locations').doc(documentId).delete();
+  }
+}

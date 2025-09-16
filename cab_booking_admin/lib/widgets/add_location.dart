@@ -1,17 +1,17 @@
-// lib/widgets/add_location_dialog.dart
+import 'package:cab_booking_admin/auth/location_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../utils/constants.dart';
 import "custom_location_textfield.dart";
 
-class AddLocationDialog extends StatefulWidget {
+class AddLocationDialog extends ConsumerStatefulWidget {
   const AddLocationDialog({Key? key}) : super(key: key);
 
   @override
-  State<AddLocationDialog> createState() => _AddLocationDialogState();
+  ConsumerState<AddLocationDialog> createState() => _AddLocationDialogState();
 }
 
-class _AddLocationDialogState extends State<AddLocationDialog> {
+class _AddLocationDialogState extends ConsumerState<AddLocationDialog> {
   final TextEditingController _cityOneController = TextEditingController();
   final TextEditingController _cityTwoController = TextEditingController();
   final TextEditingController _cityOneAreaController = TextEditingController();
@@ -75,27 +75,30 @@ class _AddLocationDialogState extends State<AddLocationDialog> {
 
   void _saveLocation() async {
     if (_cityOneController.text.isEmpty && _cityTwoController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter at least one city')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please enter at least one city')),
+        );
+      }
       return;
     }
 
     try {
-      await FirebaseFirestore.instance.collection('locations').add({
-        'cityOne': _cityOneController.text.trim(),
-        'cityTwo': _cityTwoController.text.trim(),
-        'cityOneAreas': _cityOneAreas,
-        'cityTwoAreas': _cityTwoAreas,
-        'advancePrice': _advancePriceController.text.trim(),
-        'prices': {
-          'sedan': _sedanPriceController.text.trim(),
-          'hatchback': _hatchbackPriceController.text.trim(),
-          'suvErtiga': _suvErtigaPriceController.text.trim(),
-          'xylo': _xyloPriceController.text.trim(),
-        },
-        'createdAt': FieldValue.serverTimestamp(),
-      });
+      await ref
+          .read(locationActionsProvider)
+          .addLocation(
+            cityOne: _cityOneController.text.trim(),
+            cityTwo: _cityTwoController.text.trim(),
+            cityOneAreas: _cityOneAreas,
+            cityTwoAreas: _cityTwoAreas,
+            advancePrice: _advancePriceController.text.trim(),
+            prices: {
+              'sedan': _sedanPriceController.text.trim(),
+              'hatchback': _hatchbackPriceController.text.trim(),
+              'suvErtiga': _suvErtigaPriceController.text.trim(),
+              'xylo': _xyloPriceController.text.trim(),
+            },
+          );
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -189,13 +192,11 @@ class _AddLocationDialogState extends State<AddLocationDialog> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         CustomLocationTextfield(
-                          // Renamed widget
                           hintText: "City One",
                           controller: _cityOneController,
                         ),
                         _buildSectionTitle("City One Areas"),
                         CustomLocationTextfield(
-                          // Renamed widget
                           hintText: "Add City One Area",
                           controller: _cityOneAreaController,
                           isAreaField: true,
@@ -211,13 +212,11 @@ class _AddLocationDialogState extends State<AddLocationDialog> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         CustomLocationTextfield(
-                          // Renamed widget
                           hintText: "City Two",
                           controller: _cityTwoController,
                         ),
                         _buildSectionTitle("City Two Areas"),
                         CustomLocationTextfield(
-                          // Renamed widget
                           hintText: "Add City Two Area",
                           controller: _cityTwoAreaController,
                           isAreaField: true,
@@ -239,13 +238,11 @@ class _AddLocationDialogState extends State<AddLocationDialog> {
                     child: Column(
                       children: [
                         CustomLocationTextfield(
-                          // Renamed widget
                           hintText: "Sedan Price",
                           controller: _sedanPriceController,
                           keyboardType: TextInputType.number,
                         ),
                         CustomLocationTextfield(
-                          // Renamed widget
                           hintText: "Suv - Ertiga",
                           controller: _suvErtigaPriceController,
                           keyboardType: TextInputType.number,
@@ -258,13 +255,11 @@ class _AddLocationDialogState extends State<AddLocationDialog> {
                     child: Column(
                       children: [
                         CustomLocationTextfield(
-                          // Renamed widget
                           hintText: "Hatchback Price",
                           controller: _hatchbackPriceController,
                           keyboardType: TextInputType.number,
                         ),
                         CustomLocationTextfield(
-                          // Renamed widget
                           hintText: "Xylo Price",
                           controller: _xyloPriceController,
                           keyboardType: TextInputType.number,
@@ -275,7 +270,6 @@ class _AddLocationDialogState extends State<AddLocationDialog> {
                 ],
               ),
               CustomLocationTextfield(
-                // Renamed widget
                 hintText: "Advance Price",
                 controller: _advancePriceController,
                 keyboardType: TextInputType.number,

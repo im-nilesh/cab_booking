@@ -1,9 +1,10 @@
+import 'package:cab_booking_admin/auth/location_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../utils/constants.dart';
-import 'custom_location_textfield.dart';
+import "custom_location_textfield.dart";
 
-class EditLocationDialog extends StatefulWidget {
+class EditLocationDialog extends ConsumerStatefulWidget {
   final String documentId;
   final Map<String, dynamic> locationData;
 
@@ -14,10 +15,10 @@ class EditLocationDialog extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<EditLocationDialog> createState() => _EditLocationDialogState();
+  ConsumerState<EditLocationDialog> createState() => _EditLocationDialogState();
 }
 
-class _EditLocationDialogState extends State<EditLocationDialog> {
+class _EditLocationDialogState extends ConsumerState<EditLocationDialog> {
   late final TextEditingController _cityOneController;
   late final TextEditingController _cityTwoController;
   late final TextEditingController _cityOneAreaController;
@@ -34,7 +35,6 @@ class _EditLocationDialogState extends State<EditLocationDialog> {
   @override
   void initState() {
     super.initState();
-    // Initialize controllers with existing data
     _cityOneController = TextEditingController(
       text: widget.locationData['cityOne'] ?? '',
     );
@@ -113,30 +113,31 @@ class _EditLocationDialogState extends State<EditLocationDialog> {
 
   void _updateLocation() async {
     if (_cityOneController.text.isEmpty && _cityTwoController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter at least one city')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please enter at least one city')),
+        );
+      }
       return;
     }
 
     try {
-      await FirebaseFirestore.instance
-          .collection('locations')
-          .doc(widget.documentId)
-          .update({
-            'cityOne': _cityOneController.text.trim(),
-            'cityTwo': _cityTwoController.text.trim(),
-            'cityOneAreas': _cityOneAreas,
-            'cityTwoAreas': _cityTwoAreas,
-            'advancePrice': _advancePriceController.text.trim(),
-            'prices': {
+      await ref
+          .read(locationActionsProvider)
+          .updateLocation(
+            documentId: widget.documentId,
+            cityOne: _cityOneController.text.trim(),
+            cityTwo: _cityTwoController.text.trim(),
+            cityOneAreas: _cityOneAreas,
+            cityTwoAreas: _cityTwoAreas,
+            advancePrice: _advancePriceController.text.trim(),
+            prices: {
               'sedan': _sedanPriceController.text.trim(),
               'hatchback': _hatchbackPriceController.text.trim(),
               'suvErtiga': _suvErtigaPriceController.text.trim(),
               'xylo': _xyloPriceController.text.trim(),
             },
-            'updatedAt': FieldValue.serverTimestamp(),
-          });
+          );
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
