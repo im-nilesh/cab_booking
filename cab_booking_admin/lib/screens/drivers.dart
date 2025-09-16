@@ -61,20 +61,71 @@ class DriversPage extends ConsumerWidget {
     );
   }
 
-  // Helper to update registration_status in Firestore
-  Future<void> _updateRegistrationStatus(String driverId, String status) async {
-    await FirebaseFirestore.instance.collection('drivers').doc(driverId).update(
-      {'registration_status': status},
-    );
+  // Helper function to build a DataCell for actions
+  DataCell _buildActionCells(
+    BuildContext context,
+    WidgetRef ref,
+    Map<String, dynamic> driver,
+  ) {
+    final status = driver['registration_status'] ?? 'incomplete';
+    final driverActions = ref.read(driverActionsProvider);
+
+    if (status == 'rejected') {
+      return const DataCell(Row(children: []));
+    } else if (status == 'incomplete') {
+      return DataCell(
+        Row(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.close, color: Colors.red),
+              tooltip: 'Reject Registration',
+              onPressed: () async {
+                await driverActions.updateRegistrationStatus(
+                  driver['id']!,
+                  'rejected',
+                );
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.check, color: Colors.green),
+              tooltip: 'Approve Registration',
+              onPressed: () async {
+                await driverActions.updateRegistrationStatus(
+                  driver['id']!,
+                  'complete',
+                );
+              },
+            ),
+          ],
+        ),
+      );
+    } else {
+      // Assume 'complete'
+      return DataCell(
+        Row(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.edit, color: Colors.green),
+              onPressed: () {
+                // TODO: Add edit logic here
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.delete, color: Colors.red),
+              onPressed: () {
+                // TODO: Add delete logic here
+              },
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final filteredDrivers = ref.watch(filteredDriversProvider);
     final driversAsyncValue = ref.watch(driversStreamProvider);
-    final updateRegistrationStatus = ref.read(
-      updateDriverRegistrationStatusProvider,
-    );
 
     return Padding(
       padding: const EdgeInsets.all(20),
@@ -165,11 +216,7 @@ class DriversPage extends ConsumerWidget {
                             DataCell(Text(driver['phone']!)),
                             DataCell(Text(driver['age']!)),
                             DataCell(Text(driver['vehicleNumber']!)),
-                            _buildDocCells(
-                              context,
-                              ref,
-                              driver,
-                            ), // Corrected call
+                            _buildDocCells(context, ref, driver),
                             DataCell(
                               Text(
                                 driver['status']!,
@@ -182,57 +229,7 @@ class DriversPage extends ConsumerWidget {
                                 ),
                               ),
                             ),
-                            DataCell(
-                              Row(
-                                children: [
-                                  if ((driver['registration_status'] ??
-                                          'incomplete') ==
-                                      'incomplete') ...[
-                                    IconButton(
-                                      icon: const Icon(
-                                        Icons.close,
-                                        color: Colors.red,
-                                      ),
-                                      tooltip: 'Reject Registration',
-                                      onPressed: () async {
-                                        await updateRegistrationStatus(
-                                          driver['id'],
-                                          'rejected',
-                                        );
-                                      },
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(
-                                        Icons.check,
-                                        color: Colors.green,
-                                      ),
-                                      tooltip: 'Approve Registration',
-                                      onPressed: () async {
-                                        await updateRegistrationStatus(
-                                          driver['id'],
-                                          'complete',
-                                        );
-                                      },
-                                    ),
-                                  ] else ...[
-                                    IconButton(
-                                      icon: const Icon(
-                                        Icons.edit,
-                                        color: Colors.green,
-                                      ),
-                                      onPressed: () {},
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(
-                                        Icons.delete,
-                                        color: Colors.red,
-                                      ),
-                                      onPressed: () {},
-                                    ),
-                                  ],
-                                ],
-                              ),
-                            ),
+                            _buildActionCells(context, ref, driver),
                           ],
                         );
                       }).toList(),

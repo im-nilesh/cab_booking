@@ -57,12 +57,20 @@ final filteredDriversProvider = Provider<List<Map<String, dynamic>>>((ref) {
   );
 });
 
-final updateDriverRegistrationStatusProvider =
-    Provider<Future<void> Function(String, String)>((ref) {
-      return (String driverId, String status) async {
-        await FirebaseFirestore.instance
-            .collection('drivers')
-            .doc(driverId)
-            .update({'registration_status': status});
-      };
+// Class to define actions for the drivers
+class DriverActions {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  Future<void> updateRegistrationStatus(String driverId, String status) async {
+    await _firestore.collection('drivers').doc(driverId).update({
+      'registration_status': status,
     });
+  }
+
+  // You can add more actions here, like deleteDriver, etc.
+}
+
+// Provider for the DriverActions class
+final driverActionsProvider = Provider<DriverActions>((ref) {
+  return DriverActions();
+});
