@@ -1,10 +1,11 @@
+import 'package:cab_booking_user/navigations/user_navigations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cab_booking_user/providers/auth_provider.dart';
 import 'package:cab_booking_user/utils/constants.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:cab_booking_user/Widgets/button/primary_button.dart'; // Import your custom PrimaryButton
-import 'package:cab_booking_user/Widgets/textfield/custom_text_field.dart'; // Import your custom TextField
+import 'package:cab_booking_user/Widgets/button/primary_button.dart';
+import 'package:cab_booking_user/Widgets/textfield/custom_text_field.dart';
 
 class UserRegistrationScreen extends ConsumerStatefulWidget {
   const UserRegistrationScreen({super.key});
@@ -16,14 +17,12 @@ class UserRegistrationScreen extends ConsumerStatefulWidget {
 
 class _UserRegistrationScreenState
     extends ConsumerState<UserRegistrationScreen> {
-  // Declare the controllers
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _ageController = TextEditingController();
 
   @override
   void dispose() {
-    // Dispose the controllers to free up resources
     _firstNameController.dispose();
     _lastNameController.dispose();
     _ageController.dispose();
@@ -48,7 +47,6 @@ class _UserRegistrationScreenState
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Title
             Text(
               'Basic Information',
               style: GoogleFonts.outfit(
@@ -58,8 +56,6 @@ class _UserRegistrationScreenState
               ),
             ),
             const SizedBox(height: 20),
-
-            // First Name and Last Name Fields
             Text(
               "What's your name?",
               style: GoogleFonts.outfit(
@@ -79,8 +75,6 @@ class _UserRegistrationScreenState
               hintText: 'Last Name',
             ),
             const SizedBox(height: 20),
-
-            // Age Field
             Text(
               "What's your age?",
               style: GoogleFonts.outfit(
@@ -96,18 +90,15 @@ class _UserRegistrationScreenState
               keyboardType: TextInputType.number,
             ),
             const Spacer(),
-
-            // Done Button using PrimaryButton aligned to the right
             Row(
-              mainAxisAlignment: MainAxisAlignment.end, // Align to the right
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 SizedBox(
-                  width:
-                      MediaQuery.of(context).size.width * 0.4, // Adjust width
+                  width: MediaQuery.of(context).size.width * 0.4,
                   height: MediaQuery.of(context).size.height * 0.07,
                   child: PrimaryButton(
                     text: 'Done',
-                    onPressed: () {
+                    onPressed: () async {
                       final firstName = _firstNameController.text.trim();
                       final lastName = _lastNameController.text.trim();
                       final age = _ageController.text.trim();
@@ -115,23 +106,63 @@ class _UserRegistrationScreenState
                       if (firstName.isEmpty ||
                           lastName.isEmpty ||
                           age.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Please fill out all fields'),
-                          ),
-                        );
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Please fill out all fields'),
+                            ),
+                          );
+                        }
                         return;
                       }
 
-                      // Call the saveUserData method from the provider
-                      ref
+                      // Show loading indicator
+                      ref.read(authProvider.notifier).state = ref
+                          .read(authProvider.notifier)
+                          .state
+                          .copyWith(isLoading: true);
+
+                      final success = await ref
                           .read(authProvider.notifier)
                           .saveUserData(
-                            context: context,
                             firstName: firstName,
                             lastName: lastName,
                             age: age,
                           );
+
+                      // Hide loading indicator
+                      if (mounted) {
+                        ref.read(authProvider.notifier).state = ref
+                            .read(authProvider.notifier)
+                            .state
+                            .copyWith(isLoading: false);
+                      }
+
+                      if (success) {
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Registration Successful!'),
+                            ),
+                          );
+                          Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                              builder: (context) => const UserNavigation(),
+                            ),
+                            (Route<dynamic> route) => false,
+                          );
+                        }
+                      } else {
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Registration Failed. Please try again.',
+                              ),
+                            ),
+                          );
+                        }
+                      }
                     },
                   ),
                 ),
