@@ -1,97 +1,71 @@
+import 'package:cab_booking_admin/auth/driver_provider.dart';
+import 'package:cab_booking_admin/components/dialog_document.dart';
 import 'package:cab_booking_admin/widgets/custom_table.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class DriversPage extends StatefulWidget {
+class DriversPage extends ConsumerWidget {
   const DriversPage({super.key});
 
-  @override
-  State<DriversPage> createState() => _DriversPageState();
-}
-
-class _DriversPageState extends State<DriversPage> {
-  final TextEditingController _searchController = TextEditingController();
-  String _searchQuery = '';
-
-  void _filterDrivers(String query) {
-    setState(() {
-      _searchQuery = query.trim().toLowerCase();
-    });
-  }
-
-  Future<void> _showDocumentDialog(
+  // Helper function to build a DataCell for documents
+  DataCell _buildDocCells(
     BuildContext context,
-    String storagePath,
-    String docName,
-  ) async {
-    String? imageUrl;
+    WidgetRef ref,
+    Map<String, dynamic> driver,
+  ) {
+    final Map<String, String> docLabels = {
+      'rc_path': 'RC',
+      'pollution_certificate_path': 'Pollution Certificate',
+      'number_plate_path': 'Number Plate',
+      'insurance_copy_path': 'Insurance Copy',
+      'driving_license_path': 'Driving License',
+    };
 
-    try {
-      imageUrl =
-          await FirebaseStorage.instance.ref(storagePath).getDownloadURL();
-      debugPrint('Download URL: $imageUrl');
-    } catch (e) {
-      debugPrint('Failed to load image from $storagePath: $e');
-      imageUrl = null;
-    }
+    return DataCell(
+      Row(
+        children:
+            docLabels.entries.map((entry) {
+              final docKey = entry.key;
+              final docLabel = entry.value;
+              final docPath = driver['docs'][docKey];
 
-    showDialog(
-      context: context,
-      builder:
-          (_) => Dialog(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    docName,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
-                ),
-                if (imageUrl != null)
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: SizedBox(
-                      width: 300, // Set desired width
-                      height: 400, // Set desired height
-                      child: Image.network(
-                        imageUrl,
-                        fit: BoxFit.contain,
-                        loadingBuilder: (context, child, progress) {
-                          if (progress == null) return child;
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        },
-                        errorBuilder:
-                            (_, __, ___) => const Center(
-                              child: Text('Unable to load image.'),
-                            ),
+              if (docPath != null && docPath.toString().isNotEmpty) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                  child: Tooltip(
+                    message: docLabel,
+                    child: InkWell(
+                      onTap:
+                          () => showDialog(
+                            context: context,
+                            builder:
+                                (_) => DocumentDialog(
+                                  storagePath: docPath,
+                                  docName: docLabel,
+                                ),
+                          ),
+                      child: const Icon(
+                        Icons.insert_drive_file,
+                        size: 22,
+                        color: Colors.grey,
                       ),
                     ),
-                  )
-                else
-                  const Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Text('Unable to load image.'),
                   ),
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Close'),
-                ),
-              ],
-            ),
-          ),
+                );
+              } else {
+                return const SizedBox(width: 26);
+              }
+            }).toList(),
+      ),
     );
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final filteredDrivers = ref.watch(filteredDriversProvider);
+    final driversAsyncValue = ref.watch(driversStreamProvider);
+
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -103,7 +77,6 @@ class _DriversPageState extends State<DriversPage> {
           ),
           const SizedBox(height: 14),
           TextField(
-            controller: _searchController,
             decoration: InputDecoration(
               hintText: 'Search drivers...',
               hintStyle: const TextStyle(color: Colors.grey),
@@ -116,63 +89,23 @@ class _DriversPageState extends State<DriversPage> {
               filled: true,
               fillColor: Colors.white.withOpacity(0.9),
             ),
-            onChanged: _filterDrivers,
+            onChanged: (query) {
+              ref.read(driversSearchQueryProvider.notifier).state = query;
+            },
           ),
           const SizedBox(height: 20),
           Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-              stream:
-                  FirebaseFirestore.instance.collection('drivers').snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            child: driversAsyncValue.when(
+              data: (data) {
+                if (filteredDrivers.isEmpty &&
+                    ref.read(driversSearchQueryProvider).isEmpty) {
                   return const Center(child: Text('No drivers found.'));
+                } else if (filteredDrivers.isEmpty &&
+                    ref.read(driversSearchQueryProvider).isNotEmpty) {
+                  return const Center(
+                    child: Text('No results for this search.'),
+                  );
                 }
-
-                final drivers =
-                    snapshot.data!.docs
-                        .map((doc) {
-                          final data = doc.data() as Map<String, dynamic>;
-                          return {
-                            'firstName': data['firstName'] ?? '',
-                            'lastName': data['lastName'] ?? '',
-                            'phone': data['phone_number'] ?? '',
-                            'age': data['age']?.toString() ?? '',
-                            'vehicleNumber': data['vehicle_number'] ?? '',
-                            'status': data['status'] ?? 'active',
-                            'rc_path': data['rc_path'],
-                            'pollution_certificate_path':
-                                data['pollution_certificate_path'],
-                            'number_plate_path': data['number_plate_path'],
-                            'insurance_copy_path': data['insurance_copy_path'],
-                            'driving_license_path':
-                                data['driving_license_path'],
-                          };
-                        })
-                        .where((driver) {
-                          return driver['firstName']!.toLowerCase().contains(
-                                _searchQuery,
-                              ) ||
-                              driver['lastName']!.toLowerCase().contains(
-                                _searchQuery,
-                              ) ||
-                              driver['phone']!.contains(_searchQuery) ||
-                              driver['vehicleNumber']!.toLowerCase().contains(
-                                _searchQuery,
-                              );
-                        })
-                        .toList();
-
-                final Map<String, String> docLabels = {
-                  'rc_path': 'RC',
-                  'pollution_certificate_path': 'Pollution Certificate',
-                  'number_plate_path': 'Number Plate',
-                  'insurance_copy_path': 'Insurance Copy',
-                  'driving_license_path': 'Driving License',
-                };
-
                 return CustomDataTable(
                   columns: const [
                     DataColumn(label: Text('First Name')),
@@ -185,7 +118,7 @@ class _DriversPageState extends State<DriversPage> {
                     DataColumn(label: Text('Actions')),
                   ],
                   rows:
-                      drivers.asMap().entries.map((entry) {
+                      filteredDrivers.asMap().entries.map((entry) {
                         final index = entry.key;
                         final driver = entry.value;
 
@@ -209,7 +142,7 @@ class _DriversPageState extends State<DriversPage> {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    driver['age'],
+                                    driver['age']!,
                                     style: const TextStyle(
                                       fontSize: 12,
                                       color: Colors.grey,
@@ -222,42 +155,11 @@ class _DriversPageState extends State<DriversPage> {
                             DataCell(Text(driver['phone']!)),
                             DataCell(Text(driver['age']!)),
                             DataCell(Text(driver['vehicleNumber']!)),
-                            DataCell(
-                              Row(
-                                children:
-                                    docLabels.entries.map((entry) {
-                                      final docKey = entry.key;
-                                      final docLabel = entry.value;
-                                      final docPath = driver[docKey];
-                                      if (docPath != null &&
-                                          docPath.toString().isNotEmpty) {
-                                        return Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 2.0,
-                                          ),
-                                          child: Tooltip(
-                                            message: docLabel,
-                                            child: InkWell(
-                                              onTap:
-                                                  () => _showDocumentDialog(
-                                                    context,
-                                                    docPath,
-                                                    docLabel,
-                                                  ),
-                                              child: const Icon(
-                                                Icons.insert_drive_file,
-                                                size: 22,
-                                                color: Colors.grey,
-                                              ),
-                                            ),
-                                          ),
-                                        );
-                                      } else {
-                                        return const SizedBox(width: 26);
-                                      }
-                                    }).toList(),
-                              ),
-                            ),
+                            _buildDocCells(
+                              context,
+                              ref,
+                              driver,
+                            ), // Corrected call
                             DataCell(
                               Text(
                                 driver['status']!,
@@ -295,6 +197,8 @@ class _DriversPageState extends State<DriversPage> {
                       }).toList(),
                 );
               },
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (err, stack) => Center(child: Text('Error: $err')),
             ),
           ),
         ],

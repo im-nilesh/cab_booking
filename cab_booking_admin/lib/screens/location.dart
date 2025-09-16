@@ -19,7 +19,6 @@ class LocationScreen extends ConsumerWidget {
     );
   }
 
-  // This method now correctly shows the dialog widget
   void _showEditLocationDialog(
     BuildContext context,
     String documentId,
@@ -130,7 +129,6 @@ class LocationScreen extends ConsumerWidget {
                                       color: greencolor,
                                     ),
                                     onPressed: () {
-                                      // Call the corrected method to show the dialog
                                       _showEditLocationDialog(
                                         context,
                                         loc['id']!,
@@ -145,10 +143,11 @@ class LocationScreen extends ConsumerWidget {
                                       color: Colors.red,
                                     ),
                                     onPressed: () async {
-                                      await FirebaseFirestore.instance
-                                          .collection('locations')
-                                          .doc(loc['id'])
-                                          .delete();
+                                      await ref
+                                          .read(locationActionsProvider)
+                                          .deleteLocation(
+                                            documentId: loc['id']!,
+                                          );
                                     },
                                   ),
                                 ],
