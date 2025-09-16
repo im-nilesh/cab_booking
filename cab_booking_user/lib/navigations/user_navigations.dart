@@ -35,33 +35,33 @@ class _UserNavigationState extends State<UserNavigation> {
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: SvgPicture.asset(
-              'assets/home.svg',
+              'assets/images/svg/Vector.svg',
               colorFilter: ColorFilter.mode(grayColor2, BlendMode.srcIn),
             ),
             activeIcon: SvgPicture.asset(
-              'assets/home.svg',
+              'assets/images/svg/Vector.svg',
               colorFilter: ColorFilter.mode(greencolor, BlendMode.srcIn),
             ),
             label: 'Home',
           ),
           BottomNavigationBarItem(
             icon: SvgPicture.asset(
-              'assets/search.svg',
+              'assets/images/svg/majesticons_search-line.svg',
               colorFilter: ColorFilter.mode(grayColor2, BlendMode.srcIn),
             ),
             activeIcon: SvgPicture.asset(
-              'assets/search.svg',
+              'assets/images/svg/majesticons_search-line.svg',
               colorFilter: ColorFilter.mode(greencolor, BlendMode.srcIn),
             ),
             label: 'Search',
           ),
           BottomNavigationBarItem(
             icon: SvgPicture.asset(
-              'assets/profile.svg',
+              'assets/images/svg/profile-circle.svg',
               colorFilter: ColorFilter.mode(grayColor2, BlendMode.srcIn),
             ),
             activeIcon: SvgPicture.asset(
-              'assets/profile.svg',
+              'assets/images/svg/profile-circle.svg',
               colorFilter: ColorFilter.mode(greencolor, BlendMode.srcIn),
             ),
             label: 'Profile',
