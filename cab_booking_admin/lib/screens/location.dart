@@ -1,28 +1,16 @@
+import 'package:cab_booking_admin/auth/location_provider.dart';
 import 'package:cab_booking_admin/widgets/add_location.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cab_booking_admin/widgets/edit_dialog_box.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../widgets/custom_table.dart';
-import '../utils/constants.dart'; // Import your constants
+import '../utils/constants.dart';
 
-class LocationScreen extends StatefulWidget {
+class LocationScreen extends ConsumerWidget {
   const LocationScreen({Key? key}) : super(key: key);
 
-  @override
-  State<LocationScreen> createState() => _LocationScreenState();
-}
-
-class _LocationScreenState extends State<LocationScreen> {
-  final TextEditingController _searchController = TextEditingController();
-  String _searchQuery = '';
-
-  void _filterLocations(String query) {
-    setState(() {
-      _searchQuery = query.trim().toLowerCase();
-    });
-  }
-
-  // Function to show the Add Location Dialog
-  void _showAddLocationDialog() {
+  void _showAddLocationDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -31,8 +19,28 @@ class _LocationScreenState extends State<LocationScreen> {
     );
   }
 
+  // This method now correctly shows the dialog widget
+  void _showEditLocationDialog(
+    BuildContext context,
+    String documentId,
+    Map<String, dynamic> locationData,
+  ) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return EditLocationDialog(
+          documentId: documentId,
+          locationData: locationData,
+        );
+      },
+    );
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final locations = ref.watch(filteredLocationsProvider);
+    final locationsAsyncValue = ref.watch(locationsStreamProvider);
+
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -47,7 +55,6 @@ class _LocationScreenState extends State<LocationScreen> {
             children: [
               Expanded(
                 child: TextField(
-                  controller: _searchController,
                   decoration: InputDecoration(
                     hintText: 'Search',
                     border: OutlineInputBorder(
@@ -55,7 +62,9 @@ class _LocationScreenState extends State<LocationScreen> {
                     ),
                     prefixIcon: const Icon(Icons.search),
                   ),
-                  onChanged: _filterLocations,
+                  onChanged: (query) {
+                    ref.read(searchQueryProvider.notifier).state = query;
+                  },
                 ),
               ),
               const SizedBox(width: 20),
@@ -63,14 +72,14 @@ class _LocationScreenState extends State<LocationScreen> {
                 height: 48,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: greencolor, // Use your constant
-                    foregroundColor: whiteColor, // Use your constant
+                    backgroundColor: greencolor,
+                    foregroundColor: whiteColor,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                     elevation: 2,
                   ),
-                  onPressed: _showAddLocationDialog, // Call the dialog function
+                  onPressed: () => _showAddLocationDialog(context),
                   child: const Text(
                     "Add Location",
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
@@ -81,73 +90,17 @@ class _LocationScreenState extends State<LocationScreen> {
           ),
           const SizedBox(height: 24),
           Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-              stream:
-                  FirebaseFirestore.instance
-                      .collection('locations')
-                      .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            child: locationsAsyncValue.when(
+              data: (data) {
+                if (locations.isEmpty &&
+                    ref.read(searchQueryProvider).isEmpty) {
                   return const Center(child: Text('No locations found.'));
+                } else if (locations.isEmpty &&
+                    ref.read(searchQueryProvider).isNotEmpty) {
+                  return const Center(
+                    child: Text('No results for this search.'),
+                  );
                 }
-
-                final locations =
-                    snapshot.data!.docs
-                        .map((doc) {
-                          final data = doc.data() as Map<String, dynamic>;
-                          // Extracting prices from the 'prices' map
-                          final Map<String, dynamic> prices =
-                              data['prices'] ?? {};
-
-                          return {
-                            'id': doc.id, // Important for edit/delete
-                            'cityOne': data['cityOne'] ?? '',
-                            'cityTwo': data['cityTwo'] ?? '',
-                            'cityOneAreas':
-                                (data['cityOneAreas'] as List<dynamic>?)?.join(
-                                  ', ',
-                                ) ??
-                                '',
-                            'cityTwoAreas':
-                                (data['cityTwoAreas'] as List<dynamic>?)?.join(
-                                  ', ',
-                                ) ??
-                                '',
-                            'advancePrice': data['advancePrice'] ?? '',
-                            'sedanPrice': prices['sedan'] ?? '',
-                            'hatchbackPrice': prices['hatchback'] ?? '',
-                            'suvErtigaPrice': prices['suvErtiga'] ?? '',
-                            'xyloPrice': prices['xylo'] ?? '',
-                            // You might want to combine these into a single 'prices' string for display
-                            'pricesCombined':
-                                'S: ${prices['sedan'] ?? ''}, H: ${prices['hatchback'] ?? ''}, E: ${prices['suvErtiga'] ?? ''}, X: ${prices['xylo'] ?? ''}',
-                          };
-                        })
-                        .where((loc) {
-                          return loc['cityOne']!.toLowerCase().contains(
-                                _searchQuery,
-                              ) ||
-                              loc['cityTwo']!.toLowerCase().contains(
-                                _searchQuery,
-                              ) ||
-                              loc['cityOneAreas']!.toLowerCase().contains(
-                                _searchQuery,
-                              ) ||
-                              loc['cityTwoAreas']!.toLowerCase().contains(
-                                _searchQuery,
-                              ) ||
-                              loc['pricesCombined']!.toLowerCase().contains(
-                                _searchQuery,
-                              ) ||
-                              loc['advancePrice']!.toLowerCase().contains(
-                                _searchQuery,
-                              );
-                        })
-                        .toList();
-
                 return CustomDataTable(
                   columns: const [
                     DataColumn(label: Text('City One')),
@@ -155,15 +108,11 @@ class _LocationScreenState extends State<LocationScreen> {
                     DataColumn(label: Text('City One Areas')),
                     DataColumn(label: Text('City Two Areas')),
                     DataColumn(label: Text('Advance Price')),
-                    DataColumn(
-                      label: Text('Prices'),
-                    ), // Now shows combined prices
+                    DataColumn(label: Text('Prices')),
                     DataColumn(label: Text('Actions')),
                   ],
                   rows:
-                      locations.asMap().entries.map((entry) {
-                        final index = entry.key;
-                        final loc = entry.value;
+                      locations.map((loc) {
                         return DataRow(
                           cells: [
                             DataCell(Text(loc['cityOne']!)),
@@ -171,20 +120,23 @@ class _LocationScreenState extends State<LocationScreen> {
                             DataCell(Text(loc['cityOneAreas']!)),
                             DataCell(Text(loc['cityTwoAreas']!)),
                             DataCell(Text(loc['advancePrice']!)),
-                            DataCell(
-                              Text(loc['pricesCombined']!),
-                            ), // Display combined prices
+                            DataCell(Text(loc['pricesCombined']!)),
                             DataCell(
                               Row(
                                 children: [
                                   IconButton(
                                     icon: const Icon(
                                       Icons.edit,
-                                      color: greencolor, // Use your constant
+                                      color: greencolor,
                                     ),
                                     onPressed: () {
-                                      // TODO: Implement Edit location logic using loc['id'] and loc data
-                                      print('Edit ${loc['id']}');
+                                      // Call the corrected method to show the dialog
+                                      _showEditLocationDialog(
+                                        context,
+                                        loc['id']!,
+                                        loc['originalData']
+                                            as Map<String, dynamic>,
+                                      );
                                     },
                                   ),
                                   IconButton(
@@ -193,8 +145,6 @@ class _LocationScreenState extends State<LocationScreen> {
                                       color: Colors.red,
                                     ),
                                     onPressed: () async {
-                                      // TODO: Implement Delete location logic using loc['id']
-                                      print('Delete ${loc['id']}');
                                       await FirebaseFirestore.instance
                                           .collection('locations')
                                           .doc(loc['id'])
@@ -209,6 +159,8 @@ class _LocationScreenState extends State<LocationScreen> {
                       }).toList(),
                 );
               },
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (err, stack) => Center(child: Text('Error: $err')),
             ),
           ),
         ],
