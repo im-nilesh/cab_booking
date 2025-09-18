@@ -4,10 +4,10 @@ import 'package:cab_booking_user/screens/auth/driver/admin_rejected_profile.dart
 import 'package:cab_booking_user/screens/auth/driver/driver_registration_complete_screen.dart';
 import 'package:cab_booking_user/screens/auth/driver/driver_profile_created_screen.dart';
 import 'package:cab_booking_user/screens/auth/otp_screen.dart';
-import 'package:cab_booking_user/screens/user_choice.dart'; // must define `class UserChoice extends StatelessWidget`
+import 'package:cab_booking_user/screens/user_choice.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 /// Watches Firebase authentication state
@@ -53,8 +53,8 @@ final driverStatusProvider = StreamProvider<String>((ref) {
           case 'pending_review': // driver uploaded docs, waiting for admin
             return 'pending';
           case 'approved': // admin approved
-            return 'complete';
-          case 'rejected': // admin rejected
+            return 'approved';
+          case 'rejected':
             return 'rejected';
           case 'incomplete': // started but not finished
           default:
@@ -63,6 +63,7 @@ final driverStatusProvider = StreamProvider<String>((ref) {
       });
 });
 
+/// State for AuthProvider
 class AuthProvider {
   final bool isLoading;
   AuthProvider({this.isLoading = false});
@@ -72,6 +73,7 @@ class AuthProvider {
   }
 }
 
+/// Auth State Notifier
 class AuthNotifier extends StateNotifier<AuthProvider> {
   AuthNotifier() : super(AuthProvider());
 
@@ -117,14 +119,12 @@ class AuthNotifier extends StateNotifier<AuthProvider> {
               context,
               MaterialPageRoute(
                 builder:
-                    (context) => OTPScreen(
+                    (_) => OTPScreen(
                       phoneNumber: '$countryCode$phoneNumber',
                       verificationId: verificationId,
                     ),
               ),
-            ).then((_) {
-              state = state.copyWith(isLoading: false);
-            });
+            ).then((_) => state = state.copyWith(isLoading: false));
           }
         },
         codeAutoRetrievalTimeout: (String verificationId) {},
@@ -155,7 +155,7 @@ class AuthNotifier extends StateNotifier<AuthProvider> {
     state = state.copyWith(isLoading: true);
 
     try {
-      PhoneAuthCredential credential = PhoneAuthProvider.credential(
+      final credential = PhoneAuthProvider.credential(
         verificationId: verificationId,
         smsCode: otp,
       );
@@ -163,9 +163,8 @@ class AuthNotifier extends StateNotifier<AuthProvider> {
       await FirebaseAuth.instance.signInWithCredential(credential);
 
       if (context.mounted) {
-        // After OTP success, go to AuthGate
         Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const AuthGate()),
+          MaterialPageRoute(builder: (_) => const AuthGate()),
           (route) => false,
         );
       }
@@ -187,14 +186,11 @@ class AuthNotifier extends StateNotifier<AuthProvider> {
     required String age,
   }) async {
     state = state.copyWith(isLoading: true);
-
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) return false;
 
-      final uid = user.uid;
-
-      await FirebaseFirestore.instance.collection('users').doc(uid).set({
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
         'firstName': firstName,
         'lastName': lastName,
         'age': int.parse(age),
@@ -202,7 +198,6 @@ class AuthNotifier extends StateNotifier<AuthProvider> {
         'role': 'user',
         'phone_number': user.phoneNumber,
       });
-
       return true;
     } catch (e) {
       debugPrint('Error saving user data: $e');
@@ -231,62 +226,56 @@ class AuthGate extends ConsumerWidget {
           return const Scaffold(
             body: Center(child: Text('Login Screen Placeholder')),
           );
-        } else {
-          final roleAsync = ref.watch(userRoleProvider);
-          return roleAsync.when(
-            data: (role) {
-              if (role == "user") {
-                return const UserNavigation();
-              } else if (role == "driver") {
-                final driverStatus = ref.watch(driverStatusProvider);
-                return driverStatus.when(
-                  data: (status) {
-                    switch (status) {
-                      case 'new_driver':
-                        return const UserChoice(); // choose role
-                      case 'incomplete':
-                        return const DriverProfileCreatedScreen();
-                      case 'pending':
-                        return const DriverRegistrationCompleteScreen();
-                      case 'rejected':
-                        return const AdminRejectedProfileScreen();
-                      case 'complete':
-                        return const DriverNavigation();
-                      default:
-                        return const Scaffold(
-                          body: Center(child: Text('Unknown driver status')),
-                        );
-                    }
-                  },
-                  loading:
-                      () => const Scaffold(
-                        body: Center(child: CircularProgressIndicator()),
-                      ),
-                  error:
-                      (_, __) => const Scaffold(
-                        body: Center(
-                          child: Text('Error fetching driver status'),
-                        ),
-                      ),
-                );
-              } else if (role == "new_user") {
-                return const UserChoice();
-              } else {
-                return const Scaffold(
-                  body: Center(child: Text('Unknown role')),
-                );
-              }
-            },
-            loading:
-                () => const Scaffold(
-                  body: Center(child: CircularProgressIndicator()),
-                ),
-            error:
-                (_, __) => const Scaffold(
-                  body: Center(child: Text('Error fetching role')),
-                ),
-          );
         }
+
+        final roleAsync = ref.watch(userRoleProvider);
+        return roleAsync.when(
+          data: (role) {
+            if (role == 'user') return const UserNavigation();
+            if (role == 'driver') {
+              final driverStatus = ref.watch(driverStatusProvider);
+              return driverStatus.when(
+                data: (status) {
+                  switch (status) {
+                    case 'new_driver':
+                      return const UserChoice();
+                    case 'incomplete':
+                      return const DriverProfileCreatedScreen();
+                    case 'pending':
+                      return const DriverRegistrationCompleteScreen();
+                    case 'rejected':
+                      return const AdminRejectedProfileScreen();
+                    case 'approved': // ✅ driver approved by admin
+                      return const DriverNavigation();
+                    default:
+                      return const Scaffold(
+                        body: Center(child: Text('Unknown driver status')),
+                      );
+                  }
+                },
+                loading:
+                    () => const Scaffold(
+                      body: Center(child: CircularProgressIndicator()),
+                    ),
+                error:
+                    (_, __) => const Scaffold(
+                      body: Center(child: Text('Error fetching driver status')),
+                    ),
+              );
+            }
+
+            if (role == 'new_user') return const UserChoice();
+            return const Scaffold(body: Center(child: Text('Unknown role')));
+          },
+          loading:
+              () => const Scaffold(
+                body: Center(child: CircularProgressIndicator()),
+              ),
+          error:
+              (_, __) => const Scaffold(
+                body: Center(child: Text('Error fetching role')),
+              ),
+        );
       },
       loading:
           () =>

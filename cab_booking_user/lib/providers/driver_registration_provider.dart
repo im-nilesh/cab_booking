@@ -31,7 +31,7 @@ class DriverRegistrationProvider with ChangeNotifier {
   Future<void> saveDriverDetails({
     required String firstName,
     required String lastName,
-    required BuildContext context, // Added context parameter
+    required BuildContext context,
   }) async {
     try {
       final user = FirebaseAuth.instance.currentUser;
@@ -43,13 +43,15 @@ class DriverRegistrationProvider with ChangeNotifier {
         }
         return;
       }
+
       await FirebaseFirestore.instance.collection('drivers').doc(user.uid).set({
         'firstName': firstName,
         'lastName': lastName,
         'phone_number': user.phoneNumber ?? "+911234567890",
-        'registration_status': 'incomplete',
+        'registration_status': 'incomplete', // must match AuthGate
         'isProfileCreated': true,
       });
+
       setProfileCreated(true);
     } catch (e) {
       if (context.mounted) {
@@ -62,7 +64,7 @@ class DriverRegistrationProvider with ChangeNotifier {
 
   Future<void> updateDriverAge({
     required int age,
-    required BuildContext context, // Added context parameter
+    required BuildContext context,
   }) async {
     try {
       final user = FirebaseAuth.instance.currentUser;
@@ -89,22 +91,17 @@ class DriverRegistrationProvider with ChangeNotifier {
 
   Future<void> uploadDriverPhoto({
     required String photoPath,
-    required BuildContext context, // Added context parameter
+    required BuildContext context,
   }) async {
     setUploading(true);
     try {
       final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("User not authenticated")),
-          );
-        }
-        return;
-      }
+      if (user == null) return;
+
       final filePath = 'driver_photos/${user.uid}.jpg';
       final storageRef = FirebaseStorage.instance.ref().child(filePath);
       await storageRef.putFile(File(photoPath));
+
       await FirebaseFirestore.instance
           .collection('drivers')
           .doc(user.uid)
@@ -123,19 +120,14 @@ class DriverRegistrationProvider with ChangeNotifier {
   Future<void> fetchProfileImage(BuildContext context) async {
     try {
       final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("User not authenticated")),
-          );
-        }
-        return;
-      }
+      if (user == null) return;
+
       final doc =
           await FirebaseFirestore.instance
               .collection('drivers')
               .doc(user.uid)
               .get();
+
       final photoPath = doc.data()?['photo_path'];
       if (photoPath != null) {
         final url =
@@ -154,22 +146,17 @@ class DriverRegistrationProvider with ChangeNotifier {
 
   Future<void> saveVehicleNumber({
     required String vehicleNumber,
-    required BuildContext context, // Added context parameter
+    required BuildContext context,
   }) async {
     try {
       final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("User not authenticated")),
-          );
-        }
-        return;
-      }
+      if (user == null) return;
+
       await FirebaseFirestore.instance
           .collection('drivers')
           .doc(user.uid)
           .update({'vehicle_number': vehicleNumber});
+
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Vehicle number saved successfully!')),
@@ -188,16 +175,18 @@ class DriverRegistrationProvider with ChangeNotifier {
     required File? drivingLicenseFile,
     required File? vehicleNumberPlateFile,
     required File? rcFile,
-    required BuildContext context, // Added context parameter
+    required BuildContext context,
   }) async {
     setUploading(true);
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) throw Exception("User not authenticated");
+
       final storage = FirebaseStorage.instance;
       final docRef = FirebaseFirestore.instance
           .collection('drivers')
           .doc(user.uid);
+
       Map<String, String> docPaths = {};
       if (drivingLicenseFile != null) {
         final dlPath = 'driver_docs/${user.uid}/driving_license.jpg';
@@ -214,9 +203,8 @@ class DriverRegistrationProvider with ChangeNotifier {
         await storage.ref(rcPath).putFile(rcFile);
         docPaths['rc_path'] = rcPath;
       }
-      if (docPaths.isNotEmpty) {
-        await docRef.update(docPaths);
-      }
+      if (docPaths.isNotEmpty) await docRef.update(docPaths);
+
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Documents uploaded successfully!')),
@@ -236,16 +224,18 @@ class DriverRegistrationProvider with ChangeNotifier {
   Future<void> uploadAdditionalDriverDocuments({
     required File? insuranceCopyFile,
     required File? pollutionCertificateFile,
-    required BuildContext context, // Added context parameter
+    required BuildContext context,
   }) async {
     setUploading(true);
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) throw Exception("User not authenticated");
+
       final storage = FirebaseStorage.instance;
       final docRef = FirebaseFirestore.instance
           .collection('drivers')
           .doc(user.uid);
+
       Map<String, String> docPaths = {};
       if (insuranceCopyFile != null) {
         final insurancePath = 'driver_docs/${user.uid}/insurance_copy.jpg';
@@ -258,9 +248,8 @@ class DriverRegistrationProvider with ChangeNotifier {
         await storage.ref(pollutionPath).putFile(pollutionCertificateFile);
         docPaths['pollution_certificate_path'] = pollutionPath;
       }
-      if (docPaths.isNotEmpty) {
-        await docRef.update(docPaths);
-      }
+      if (docPaths.isNotEmpty) await docRef.update(docPaths);
+
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

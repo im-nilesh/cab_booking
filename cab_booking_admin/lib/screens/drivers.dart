@@ -28,7 +28,7 @@ class DriversPage extends ConsumerWidget {
             docLabels.entries.map((entry) {
               final docKey = entry.key;
               final docLabel = entry.value;
-              final docPath = driver['docs'][docKey];
+              final docPath = driver['docs']?[docKey];
 
               if (docPath != null && docPath.toString().isNotEmpty) {
                 return Padding(
@@ -73,7 +73,7 @@ class DriversPage extends ConsumerWidget {
     if (status == 'rejected') {
       return const DataCell(Row(children: []));
     } else if (status == 'incomplete' || status == 'pending') {
-      // ✅ Show approve + reject for both "incomplete" and "pending"
+      // Show approve + reject buttons
       return DataCell(
         Row(
           children: [
@@ -93,7 +93,7 @@ class DriversPage extends ConsumerWidget {
               onPressed: () async {
                 await driverActions.updateRegistrationStatus(
                   driver['id']!,
-                  'complete',
+                  'approved', // ✅ Updated to match AuthGate
                 );
               },
             ),
@@ -101,7 +101,7 @@ class DriversPage extends ConsumerWidget {
         ),
       );
     } else {
-      // Assume 'complete'
+      // For already approved drivers
       return DataCell(
         Row(
           children: [
@@ -224,10 +224,10 @@ class DriversPage extends ConsumerWidget {
                                 style: TextStyle(
                                   color:
                                       driver['registration_status'] ==
-                                              "complete"
+                                              'approved'
                                           ? Colors.green
                                           : (driver['registration_status'] ==
-                                                  "rejected"
+                                                  'rejected'
                                               ? Colors.red
                                               : Colors.orange),
                                   fontWeight: FontWeight.w600,
