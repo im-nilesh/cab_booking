@@ -1,8 +1,12 @@
 import 'package:cab_booking_user/Widgets/slider/custom_slider.dart';
 import 'package:cab_booking_user/Widgets/slider/custom_animated_slider.dart';
+import 'package:cab_booking_user/screens/welcome_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SliderScreen extends StatefulWidget {
+  const SliderScreen({super.key});
+
   @override
   _SliderScreenState createState() => _SliderScreenState();
 }
@@ -56,21 +60,22 @@ class _SliderScreenState extends State<SliderScreen> {
               },
             ),
           ),
-
-          // Custom Animated Slider Button
           Padding(
             padding: const EdgeInsets.only(bottom: 30.0),
             child: CustomAnimatedSlider(
               currentIndex: _currentPage,
               totalSlides: slides.length,
-              onNext: () {
+              onNext: () async {
                 if (_currentPage < slides.length - 1) {
                   _pageController.nextPage(
-                    duration: Duration(milliseconds: 300),
+                    duration: const Duration(milliseconds: 300),
                     curve: Curves.easeInOut,
                   );
                 } else {
-                  // TODO: Navigate to Home Screen
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => WelcomeScreen()),
+                  );
                 }
               },
             ),

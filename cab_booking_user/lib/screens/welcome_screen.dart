@@ -3,8 +3,28 @@ import 'package:cab_booking_user/Widgets/button/primary_button.dart';
 import 'package:cab_booking_user/screens/auth/signup_screen.dart'; // Import SignUpScreen
 import 'package:cab_booking_user/utils/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class WelcomeScreen extends StatelessWidget {
+class WelcomeScreen extends StatefulWidget {
+  @override
+  State<WelcomeScreen> createState() => _WelcomeScreenState();
+}
+
+class _WelcomeScreenState extends State<WelcomeScreen> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _setOnBoardingStatus();
+  }
+
+  Future<void> _setOnBoardingStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    print('Saved isFirstTime: ${prefs.getBool('isFirstTime')}');
+    await prefs.setBool('isFirstTime', true);
+    print('Saved isFirstTime: ${prefs.getBool('isFirstTime')}');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

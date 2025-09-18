@@ -3,6 +3,7 @@ import 'package:cab_booking_user/screens/flowscreen/drivers/create_ride.dart';
 import 'package:cab_booking_user/screens/flowscreen/drivers/home.dart';
 import 'package:cab_booking_user/screens/flowscreen/drivers/my_activity.dart';
 import 'package:cab_booking_user/screens/flowscreen/drivers/my_profile.dart';
+import 'package:cab_booking_user/utils/constants.dart';
 import 'package:flutter/material.dart';
 
 class DriverNavigation extends StatefulWidget {
@@ -57,48 +58,47 @@ class _DriverNavigationState extends State<DriverNavigation> {
               index: 0,
               selectedIndex: _selectedIndex,
               inactiveIconPath:
-                  'assets/icons/home_inactive.svg', // Placeholder path
+                  'assets/images/svg/Vector.svg', // Placeholder path
               activeIconPath:
-                  'assets/icons/home_active.svg', // Placeholder path
+                  'assets/images/svg/Vector-selected.svg', // Placeholder path
               label: 'Home',
               onTap: () => _onItemTapped(0),
-              selectedColor: AppTheme.primaryColor, // From your theme
+              selectedColor: greencolor,
+              unselectedColor: Colors.grey.shade500,
+            ),
+            CustomNavItem(
+              index: 2,
+              selectedIndex: _selectedIndex,
+              inactiveIconPath: '', // Placeholder path
+              activeIconPath:
+                  'assets/images/svg/createrideselected.svg', // Placeholder path
+              label: 'Create Ride',
+              onTap: () => _onItemTapped(2),
+              selectedColor: greencolor,
               unselectedColor: Colors.grey.shade500,
             ),
             CustomNavItem(
               index: 1,
               selectedIndex: _selectedIndex,
               inactiveIconPath:
-                  'assets/icons/activity_inactive.svg', // Placeholder path
+                  'assets/images/svg/myactivityunselected.svg', // Placeholder path
               activeIconPath:
                   'assets/icons/activity_active.svg', // Placeholder path
               label: 'Activity',
               onTap: () => _onItemTapped(1),
-              selectedColor: AppTheme.primaryColor,
-              unselectedColor: Colors.grey.shade500,
-            ),
-            CustomNavItem(
-              index: 2,
-              selectedIndex: _selectedIndex,
-              inactiveIconPath:
-                  'assets/icons/earnings_inactive.svg', // Placeholder path
-              activeIconPath:
-                  'assets/icons/earnings_active.svg', // Placeholder path
-              label: 'Earnings',
-              onTap: () => _onItemTapped(2),
-              selectedColor: AppTheme.primaryColor,
+              selectedColor: greencolor,
               unselectedColor: Colors.grey.shade500,
             ),
             CustomNavItem(
               index: 3,
               selectedIndex: _selectedIndex,
               inactiveIconPath:
-                  'assets/icons/profile_inactive.svg', // Placeholder path
+                  'assets/images/svg/profile-circle.svg', // Placeholder path
               activeIconPath:
-                  'assets/icons/profile_active.svg', // Placeholder path
+                  'assets/images/svg/profile-circle.svg', // Placeholder path
               label: 'Profile',
               onTap: () => _onItemTapped(3),
-              selectedColor: AppTheme.primaryColor,
+              selectedColor: greencolor,
               unselectedColor: Colors.grey.shade500,
             ),
           ],
