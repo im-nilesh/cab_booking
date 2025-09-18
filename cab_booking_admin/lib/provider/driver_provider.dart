@@ -26,10 +26,8 @@ final filteredDriversProvider = Provider<List<Map<String, dynamic>>>((ref) {
               'phone': data['phone_number'] ?? '',
               'age': data['age']?.toString() ?? '',
               'vehicleNumber': data['vehicle_number'] ?? '',
-              'status': data['status'] ?? 'active',
               'registration_status':
-                  data['registration_status'] ??
-                  'incomplete', // <-- Add this line
+                  data['registration_status'] ?? 'incomplete',
               'docs': {
                 'rc_path': data['rc_path'],
                 'pollution_certificate_path':
@@ -66,8 +64,6 @@ class DriverActions {
       'registration_status': status,
     });
   }
-
-  // You can add more actions here, like deleteDriver, etc.
 }
 
 // Provider for the DriverActions class

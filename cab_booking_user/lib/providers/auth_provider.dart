@@ -1,13 +1,51 @@
+import 'package:cab_booking_user/navigations/user_navigations.dart';
+import 'package:cab_booking_user/screens/auth/driver/admin_rejected_profile.dart';
+import 'package:cab_booking_user/screens/auth/driver/driver_registration_complete_screen.dart';
+import 'package:cab_booking_user/screens/auth/driver/driver_profile_created_screen.dart';
 import 'package:cab_booking_user/screens/auth/otp_screen.dart';
-import 'package:cab_booking_user/screens/user_choice.dart';
+import 'package:cab_booking_user/screens/user_choice.dart'; // must define `class UserChoice extends StatelessWidget`
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+/// Watches Firebase authentication state
+final authStateChangesProvider = StreamProvider<User?>((ref) {
+  return FirebaseAuth.instance.authStateChanges();
+});
+
+/// Watches the user's registration status in Firestore
+final userStatusProvider = StreamProvider<String>((ref) {
+  final user = FirebaseAuth.instance.currentUser;
+  if (user == null) {
+    return Stream.value('unauthenticated');
+  }
+
+  return FirebaseFirestore.instance
+      .collection('drivers')
+      .doc(user.uid)
+      .snapshots()
+      .map((doc) {
+        if (!doc.exists) return 'new_user';
+        final data = doc.data() as Map<String, dynamic>;
+        final status = data['registration_status'] ?? 'incomplete';
+
+        switch (status) {
+          case 'pending_review': // driver uploaded docs, waiting for admin
+            return 'pending';
+          case 'approved': // admin approved
+            return 'complete';
+          case 'rejected': // admin rejected
+            return 'rejected';
+          case 'incomplete': // started but not finished
+          default:
+            return 'incomplete';
+        }
+      });
+});
+
 class AuthProvider {
   final bool isLoading;
-
   AuthProvider({this.isLoading = false});
 
   AuthProvider copyWith({bool? isLoading}) {
@@ -18,6 +56,7 @@ class AuthProvider {
 class AuthNotifier extends StateNotifier<AuthProvider> {
   AuthNotifier() : super(AuthProvider());
 
+  /// Send OTP
   Future<void> sendOTP({
     required BuildContext context,
     required String phoneNumber,
@@ -37,44 +76,51 @@ class AuthNotifier extends StateNotifier<AuthProvider> {
         phoneNumber: '$countryCode$phoneNumber',
         verificationCompleted: (PhoneAuthCredential credential) async {
           await FirebaseAuth.instance.signInWithCredential(credential);
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Phone number verified automatically!'),
-            ),
-          );
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Phone number verified automatically!'),
+              ),
+            );
+          }
         },
         verificationFailed: (FirebaseAuthException e) {
           state = state.copyWith(isLoading: false);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Verification failed: ${e.message}')),
-          );
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Verification failed: ${e.message}')),
+            );
+          }
         },
         codeSent: (String verificationId, int? resendToken) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder:
-                  (context) => OTPScreen(
-                    phoneNumber: '$countryCode$phoneNumber',
-                    verificationId: verificationId,
-                  ),
-            ),
-          ).then((_) {
-            state = state.copyWith(isLoading: false);
-          });
+          if (context.mounted) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder:
+                    (context) => OTPScreen(
+                      phoneNumber: '$countryCode$phoneNumber',
+                      verificationId: verificationId,
+                    ),
+              ),
+            ).then((_) {
+              state = state.copyWith(isLoading: false);
+            });
+          }
         },
-        codeAutoRetrievalTimeout: (String verificationId) {
-          // Handle timeout
-        },
+        codeAutoRetrievalTimeout: (String verificationId) {},
       );
     } catch (e) {
       state = state.copyWith(isLoading: false);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+      }
     }
   }
 
+  /// Verify OTP
   Future<void> verifyOTP({
     required BuildContext context,
     required String verificationId,
@@ -97,22 +143,25 @@ class AuthNotifier extends StateNotifier<AuthProvider> {
 
       await FirebaseAuth.instance.signInWithCredential(credential);
 
-      // Navigate to UserChoiceScreen on successful verification
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const UserChoice()),
-        (route) => false, // Remove all previous routes
-      );
+      if (context.mounted) {
+        // After OTP success, go to AuthGate
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const AuthGate()),
+          (route) => false,
+        );
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Invalid OTP, please try again.')),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Invalid OTP, please try again.')),
+        );
+      }
     } finally {
       state = state.copyWith(isLoading: false);
     }
   }
 
-  // This method now returns a boolean to indicate success or failure.
+  /// Save User Data in Firestore
   Future<bool> saveUserData({
     required String firstName,
     required String lastName,
@@ -122,9 +171,8 @@ class AuthNotifier extends StateNotifier<AuthProvider> {
 
     try {
       final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        return false;
-      }
+      if (user == null) return false;
+
       final uid = user.uid;
 
       await FirebaseFirestore.instance.collection('users').doc(uid).set({
@@ -136,16 +184,72 @@ class AuthNotifier extends StateNotifier<AuthProvider> {
         'phone_number': user.phoneNumber,
       });
 
-      return true; // Return true on successful save.
+      return true;
     } catch (e) {
-      print('Error saving user data: $e');
-      return false; // Return false on error.
+      debugPrint('Error saving user data: $e');
+      return false;
     } finally {
       state = state.copyWith(isLoading: false);
     }
   }
 }
 
-final authProvider = StateNotifierProvider<AuthNotifier, AuthProvider>(
-  (ref) => AuthNotifier(),
-);
+final authProvider = StateNotifierProvider<AuthNotifier, AuthProvider>((ref) {
+  return AuthNotifier();
+});
+
+/// AuthGate decides where user goes based on status
+class AuthGate extends ConsumerWidget {
+  const AuthGate({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authStateChangesProvider);
+    final userStatus = ref.watch(userStatusProvider);
+
+    return authState.when(
+      data: (user) {
+        if (user == null) {
+          return const Scaffold(
+            body: Center(child: Text('Login Screen Placeholder')),
+          );
+        } else {
+          return userStatus.when(
+            data: (status) {
+              switch (status) {
+                case 'new_user':
+                  return const UserChoice(); // must exist
+                case 'incomplete':
+                  return const DriverProfileCreatedScreen();
+                case 'pending':
+                  return const DriverRegistrationCompleteScreen();
+                case 'rejected':
+                  return const AdminRejectedProfileScreen();
+                case 'complete':
+                  return const UserNavigation();
+                default:
+                  return const Scaffold(
+                    body: Center(child: Text('Unknown Status')),
+                  );
+              }
+            },
+            loading:
+                () => const Scaffold(
+                  body: Center(child: CircularProgressIndicator()),
+                ),
+            error:
+                (_, __) => const Scaffold(
+                  body: Center(child: Text('Error fetching status')),
+                ),
+          );
+        }
+      },
+      loading:
+          () =>
+              const Scaffold(body: Center(child: CircularProgressIndicator())),
+      error:
+          (_, __) =>
+              const Scaffold(body: Center(child: Text('Something went wrong'))),
+    );
+  }
+}

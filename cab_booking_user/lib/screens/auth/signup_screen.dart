@@ -1,20 +1,23 @@
+import 'package:cab_booking_user/navigations/user_navigations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cab_booking_user/providers/auth_provider.dart';
-import 'package:cab_booking_user/Widgets/Progress Indicator/circular_progess.dart';
+import 'package:cab_booking_user/Widgets/Progress%20Indicator/circular_progess.dart';
 import 'package:cab_booking_user/Widgets/common/custom_phoneno_textfield.dart';
 import 'package:cab_booking_user/Widgets/button/primary_button.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:cab_booking_user/utils/constants.dart';
 
 class SignUpScreen extends ConsumerStatefulWidget {
+  const SignUpScreen({super.key});
+
   @override
   _SignUpScreenState createState() => _SignUpScreenState();
 }
 
 class _SignUpScreenState extends ConsumerState<SignUpScreen> {
-  String _selectedCountryCode = '+91'; // Default country code
-  String _selectedCountryFlag = '🇮🇳'; // Default country flag
+  String _selectedCountryCode = '+91';
+  String _selectedCountryFlag = '🇮🇳';
   final TextEditingController _phoneController = TextEditingController();
 
   @override
@@ -38,7 +41,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Title
                 Text(
                   'Enter your mobile number',
                   style: TextStyle(
@@ -48,8 +50,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                   ),
                 ),
                 SizedBox(height: 20),
-
-                // Country Picker and Phone Number Input
                 Row(
                   children: [
                     GestureDetector(
@@ -97,8 +97,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                   ],
                 ),
                 SizedBox(height: 30),
-
-                // Continue Button
                 SizedBox(
                   width: double.infinity,
                   height: MediaQuery.of(context).size.height * 0.07,
@@ -106,7 +104,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                     text: 'Continue',
                     onPressed:
                         authState.isLoading
-                            ? () {}
+                            ? () {} // Corrected: Pass an empty function
                             : () {
                               authNotifier.sendOTP(
                                 context: context,
@@ -116,12 +114,12 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                             },
                   ),
                 ),
+                SizedBox(height: 20),
               ],
             ),
           ),
         ),
-        if (authState.isLoading)
-          const CustomProgressIndicator(), // Show progress indicator when loading
+        if (authState.isLoading) const CustomProgressIndicator(),
       ],
     );
   }

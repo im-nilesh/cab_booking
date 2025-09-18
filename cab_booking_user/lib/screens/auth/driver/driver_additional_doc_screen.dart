@@ -20,97 +20,112 @@ class _DriverAdditionalDocScreenState
     extends ConsumerState<DriverAdditionalDocScreen> {
   File? insuranceCopyFile;
   File? pollutionCertificateFile;
-  bool isUploading = false;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const CustomProgressBar(
-              currentStep: 2,
-              totalSteps: 2,
-              label: 'Vehicle Registration',
-            ),
-            const SizedBox(height: 30),
-            const Text(
-              'Upload additional documents',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-            const SizedBox(height: 20),
-            CustomUploadButton(
-              title: 'Insurance Copy',
-              onPressed: () {},
-              onFilePicked: (file) {
-                setState(() {
-                  insuranceCopyFile = file;
-                });
+    final provider = ref.watch(driverRegistrationProvider);
+    return Stack(
+      children: [
+        Scaffold(
+          appBar: AppBar(
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.black),
+              onPressed: () {
+                Navigator.pop(context);
               },
             ),
-            const SizedBox(height: 20),
-            CustomUploadButton(
-              title: 'Pollution Check Certificate',
-              onPressed: () {},
-              onFilePicked: (file) {
-                setState(() {
-                  pollutionCertificateFile = file;
-                });
-              },
-            ),
-            const Spacer(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+          ),
+          body: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.4,
-                  height: MediaQuery.of(context).size.height * 0.07,
-                  child: PrimaryButton(
-                    text: 'Next',
-                    onPressed: () async {
-                      setState(() {
-                        isUploading = true;
-                      });
-                      await ref
-                          .read(driverRegistrationProvider)
-                          .uploadAdditionalDriverDocuments(
-                            insuranceCopyFile: insuranceCopyFile,
-                            pollutionCertificateFile: pollutionCertificateFile,
-                            context: context,
-                          );
-                      setState(() {
-                        isUploading = false;
-                      });
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder:
-                              (context) => DriverRegistrationCompleteScreen(),
-                        ),
-                      );
-                    },
+                const CustomProgressBar(
+                  currentStep: 2,
+                  totalSteps: 2,
+                  label: 'Vehicle Registration',
+                ),
+                const SizedBox(height: 30),
+                const Text(
+                  'Upload additional documents',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
                   ),
                 ),
+                const SizedBox(height: 20),
+                CustomUploadButton(
+                  title: 'Insurance Copy',
+                  onFilePicked: (file) {
+                    setState(() {
+                      insuranceCopyFile = file;
+                    });
+                  },
+                  onPressed: () {},
+                ),
+                const SizedBox(height: 20),
+                CustomUploadButton(
+                  title: 'Pollution Check Certificate',
+                  onFilePicked: (file) {
+                    setState(() {
+                      pollutionCertificateFile = file;
+                    });
+                  },
+                  onPressed: () {},
+                ),
+                const Spacer(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.4,
+                      height: MediaQuery.of(context).size.height * 0.07,
+                      child: PrimaryButton(
+                        text: 'Next',
+                        onPressed: () async {
+                          if (insuranceCopyFile == null ||
+                              pollutionCertificateFile == null) {
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Please upload all required documents.',
+                                  ),
+                                ),
+                              );
+                            }
+                            return;
+                          }
+                          await ref
+                              .read(driverRegistrationProvider)
+                              .uploadAdditionalDriverDocuments(
+                                insuranceCopyFile: insuranceCopyFile,
+                                pollutionCertificateFile:
+                                    pollutionCertificateFile,
+                                context: context, // Pass context here
+                              );
+                          if (mounted) {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder:
+                                    (context) =>
+                                        const DriverRegistrationCompleteScreen(),
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
               ],
             ),
-            const SizedBox(height: 20),
-            if (isUploading) const CustomProgressIndicator(),
-          ],
+          ),
         ),
-      ),
+        if (provider.isUploading) const CustomProgressIndicator(),
+      ],
     );
   }
 }

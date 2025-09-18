@@ -1,30 +1,31 @@
+// lib/screens/auth/driver/driver_captured_photo_screen.dart
+
 import 'dart:io';
+import 'package:cab_booking_user/Widgets/Progress%20Indicator/circular_progess.dart';
 import 'package:cab_booking_user/Widgets/button/primary_button.dart';
-import 'package:cab_booking_user/Widgets/progress_bar/custom_progress_bar.dart'; // Use your custom progress bar
-import 'package:cab_booking_user/Widgets/Progress Indicator/circular_progess.dart'; // Import the circular progress indicator
+import 'package:cab_booking_user/Widgets/progress_bar/custom_progress_bar.dart';
 import 'package:cab_booking_user/screens/auth/driver/driver_profile_created_screen.dart';
 import 'package:cab_booking_user/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_storage/firebase_storage.dart'; // Add this import
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cab_booking_user/providers/driver_registration_provider.dart';
 
-// StateProvider to manage loading state
-final loadingProvider = StateProvider<bool>((ref) => false);
-
-class DriverCapturedPhotoScreen extends ConsumerWidget {
+class DriverCapturedPhotoScreen extends ConsumerStatefulWidget {
   final String photoPath;
-
   const DriverCapturedPhotoScreen({Key? key, required this.photoPath})
     : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final isLoading = ref.watch(loadingProvider); // Watch loading state
+  ConsumerState<DriverCapturedPhotoScreen> createState() =>
+      _DriverCapturedPhotoScreenState();
+}
 
+class _DriverCapturedPhotoScreenState
+    extends ConsumerState<DriverCapturedPhotoScreen> {
+  @override
+  Widget build(BuildContext context) {
+    final provider = ref.watch(driverRegistrationProvider);
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -38,9 +39,8 @@ class DriverCapturedPhotoScreen extends ConsumerWidget {
         children: [
           Column(
             children: [
-              // Custom Progress Bar
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.0),
                 child: CustomProgressBar(
                   currentStep: 1,
                   totalSteps: 2,
@@ -48,8 +48,6 @@ class DriverCapturedPhotoScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 15.0),
-
-              // Title
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Align(
@@ -64,26 +62,26 @@ class DriverCapturedPhotoScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 40.0),
-
-              // Captured Photo
               Center(
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(120.0), // Rounded edges
+                  borderRadius: BorderRadius.circular(120.0),
                   child: Container(
-                    width: 350.0, // Adjusted width
-                    height: 480.0, // Adjusted height
+                    width: 350.0,
+                    height: 480.0,
                     decoration: BoxDecoration(
                       border: Border.all(
                         color: Colors.grey.shade300,
                         width: 2.0,
                       ),
                     ),
-                    child: Image.file(File(photoPath), fit: BoxFit.cover),
+                    child: Image.file(
+                      File(widget.photoPath),
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
               ),
               const SizedBox(height: 40),
-              // Upload and Retake Buttons
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Column(
@@ -94,16 +92,13 @@ class DriverCapturedPhotoScreen extends ConsumerWidget {
                       child: PrimaryButton(
                         text: 'Upload',
                         onPressed: () async {
-                          ref.read(loadingProvider.notifier).state =
-                              true; // Set loading to true
-                          try {
-                            await ref
-                                .read(driverRegistrationProvider)
-                                .uploadDriverPhoto(
-                                  photoPath: photoPath,
-                                  context: context,
-                                );
-                            // Navigate to ProfileCreatedScreen
+                          await ref
+                              .read(driverRegistrationProvider)
+                              .uploadDriverPhoto(
+                                photoPath: widget.photoPath,
+                                context: context, // ADDED 'context' HERE
+                              );
+                          if (mounted) {
                             Navigator.of(context).pushReplacement(
                               MaterialPageRoute(
                                 builder:
@@ -111,13 +106,6 @@ class DriverCapturedPhotoScreen extends ConsumerWidget {
                                         const DriverProfileCreatedScreen(),
                               ),
                             );
-                          } catch (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Upload failed: $e')),
-                            );
-                          } finally {
-                            ref.read(loadingProvider.notifier).state =
-                                false; // Set loading to false
                           }
                         },
                       ),
@@ -125,7 +113,7 @@ class DriverCapturedPhotoScreen extends ConsumerWidget {
                     const SizedBox(height: 16.0),
                     GestureDetector(
                       onTap: () {
-                        Navigator.of(context).pop(); // Go back to retake photo
+                        Navigator.of(context).pop();
                       },
                       child: Text(
                         'Retake',
@@ -141,8 +129,7 @@ class DriverCapturedPhotoScreen extends ConsumerWidget {
               ),
             ],
           ),
-          // Show Circular Progress Indicator when loading
-          if (isLoading) const CustomProgressIndicator(),
+          if (provider.isUploading) const CustomProgressIndicator(),
         ],
       ),
     );

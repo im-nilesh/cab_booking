@@ -1,10 +1,11 @@
+// lib/screens/flowscreen/users/user_navigation.dart
+
+import 'package:cab_booking_user/Widgets/button/custom_nav_item.dart';
 import 'package:cab_booking_user/screens/flowscreen/users/user_homepage.dart';
 import 'package:cab_booking_user/screens/flowscreen/users/user_profilepage.dart';
 import 'package:cab_booking_user/screens/flowscreen/users/user_searchpage.dart';
 import 'package:cab_booking_user/utils/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class UserNavigation extends StatefulWidget {
   const UserNavigation({super.key});
@@ -48,62 +49,36 @@ class _UserNavigationState extends State<UserNavigation> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _buildNavItem(
+            CustomNavItem(
               index: 0,
+              selectedIndex: _selectedIndex,
               inactiveIconPath: 'assets/images/svg/Vector.svg',
               activeIconPath: 'assets/images/svg/Vector-selected.svg',
               label: 'Home',
+              onTap: () => _onItemTapped(0),
+              selectedColor: greencolor,
+              unselectedColor: grayColor2,
             ),
-            _buildNavItem(
+            CustomNavItem(
               index: 1,
+              selectedIndex: _selectedIndex,
               inactiveIconPath: 'assets/images/svg/majesticons_search-line.svg',
               activeIconPath: 'assets/images/svg/search selected.svg',
               label: 'Search',
+              onTap: () => _onItemTapped(1),
+              selectedColor: greencolor,
+              unselectedColor: grayColor2,
             ),
-            _buildNavItem(
+            CustomNavItem(
               index: 2,
+              selectedIndex: _selectedIndex,
               inactiveIconPath: 'assets/images/svg/profile-circle.svg',
               activeIconPath:
-                  'assets/images/svg/profile-circle.svg', // Using the same icon for active state
+                  'assets/images/svg/profile-circle.svg', // Same icon for active state
               label: 'Profile',
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavItem({
-    required int index,
-    required String inactiveIconPath,
-    required String activeIconPath,
-    required String label,
-  }) {
-    bool isSelected = _selectedIndex == index;
-    return Expanded(
-      child: InkWell(
-        onTap: () => _onItemTapped(index),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SvgPicture.asset(
-              isSelected ? activeIconPath : inactiveIconPath,
-              width: 24,
-              height: 24,
-              colorFilter: ColorFilter.mode(
-                isSelected ? greencolor : grayColor2,
-                BlendMode.srcIn,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: GoogleFonts.outfit(
-                fontSize: 12,
-                color: isSelected ? greencolor : grayColor2,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-              ),
+              onTap: () => _onItemTapped(2),
+              selectedColor: greencolor,
+              unselectedColor: grayColor2,
             ),
           ],
         ),

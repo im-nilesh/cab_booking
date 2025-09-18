@@ -1,23 +1,30 @@
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'dart:io';
-import 'package:firebase_storage/firebase_storage.dart';
 
-final driverRegistrationProvider = Provider(
+final driverRegistrationProvider = ChangeNotifierProvider(
   (ref) => DriverRegistrationProvider(),
 );
 
 class DriverRegistrationProvider with ChangeNotifier {
   bool _isUploading = false;
   String? _imageUrl;
+  bool _isProfileCreated = false;
 
   bool get isUploading => _isUploading;
   String? get imageUrl => _imageUrl;
+  bool get isProfileCreated => _isProfileCreated;
 
   void setUploading(bool value) {
     _isUploading = value;
+    notifyListeners();
+  }
+
+  void setProfileCreated(bool value) {
+    _isProfileCreated = value;
     notifyListeners();
   }
 
@@ -28,22 +35,28 @@ class DriverRegistrationProvider with ChangeNotifier {
   }) async {
     try {
       final user = FirebaseAuth.instance.currentUser;
-
       if (user == null) {
-        throw Exception("User not authenticated");
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("User not authenticated")),
+          );
+        }
+        return;
       }
-
-      // Save data to Firestore
       await FirebaseFirestore.instance.collection('drivers').doc(user.uid).set({
         'firstName': firstName,
         'lastName': lastName,
         'phone_number': user.phoneNumber ?? "+911234567890",
         'registration_status': 'incomplete',
+        'isProfileCreated': true,
       });
+      setProfileCreated(true);
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Failed to save details: $e')));
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to save details: $e')));
+      }
     }
   }
 
@@ -53,20 +66,24 @@ class DriverRegistrationProvider with ChangeNotifier {
   }) async {
     try {
       final user = FirebaseAuth.instance.currentUser;
-
       if (user == null) {
-        throw Exception("User not authenticated");
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("User not authenticated")),
+          );
+        }
+        return;
       }
-
-      // Update the age in Firestore
       await FirebaseFirestore.instance
           .collection('drivers')
           .doc(user.uid)
           .update({'age': age});
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Failed to update age: $e')));
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to update age: $e')));
+      }
     }
   }
 
@@ -74,69 +91,64 @@ class DriverRegistrationProvider with ChangeNotifier {
     required String photoPath,
     required BuildContext context,
   }) async {
+    setUploading(true);
     try {
-      setUploading(true); // Set uploading state to true
       final user = FirebaseAuth.instance.currentUser;
-
       if (user == null) {
-        throw Exception("User not authenticated");
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("User not authenticated")),
+          );
+        }
+        return;
       }
-
-      // Define the file path in Firebase Storage
       final filePath = 'driver_photos/${user.uid}.jpg';
-
-      // Upload the image to Firebase Storage
       final storageRef = FirebaseStorage.instance.ref().child(filePath);
-      final uploadTask = storageRef.putFile(File(photoPath));
-
-      // Wait for the upload to complete
-      await uploadTask;
-
-      // Update Firestore with the file path
+      await storageRef.putFile(File(photoPath));
       await FirebaseFirestore.instance
           .collection('drivers')
           .doc(user.uid)
-          .update({'photo_path': filePath})
-      // Show success message
-      ;
+          .update({'photo_path': filePath});
     } catch (e) {
-      // Show error message
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Failed to upload photo: $e')));
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to upload photo: $e')));
+      }
     } finally {
-      setUploading(false); // Set uploading state to false
+      setUploading(false);
     }
   }
 
   Future<void> fetchProfileImage(BuildContext context) async {
     try {
       final user = FirebaseAuth.instance.currentUser;
-
       if (user == null) {
-        throw Exception("User not authenticated");
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("User not authenticated")),
+          );
+        }
+        return;
       }
-
-      // Fetch the photo path from Firestore
       final doc =
           await FirebaseFirestore.instance
               .collection('drivers')
               .doc(user.uid)
               .get();
-
       final photoPath = doc.data()?['photo_path'];
-
       if (photoPath != null) {
-        // Get the download URL from Firebase Storage
         final url =
             await FirebaseStorage.instance.ref(photoPath).getDownloadURL();
         _imageUrl = url;
         notifyListeners();
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to load profile image: $e')),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to load profile image: $e')),
+        );
+      }
     }
   }
 
@@ -146,44 +158,50 @@ class DriverRegistrationProvider with ChangeNotifier {
   }) async {
     try {
       final user = FirebaseAuth.instance.currentUser;
-
       if (user == null) {
-        throw Exception("User not authenticated");
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("User not authenticated")),
+          );
+        }
+        return;
       }
-
-      // Save the vehicle number to Firestore
       await FirebaseFirestore.instance
           .collection('drivers')
           .doc(user.uid)
           .update({'vehicle_number': vehicleNumber});
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vehicle number saved successfully!')),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Vehicle number saved successfully!')),
+        );
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to save vehicle number: $e')),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to save vehicle number: $e')),
+        );
+      }
     }
   }
 
+  /// --- MAIN DOCS UPLOAD ---
   Future<void> uploadDriverDocuments({
     required File? drivingLicenseFile,
     required File? vehicleNumberPlateFile,
     required File? rcFile,
     required BuildContext context,
   }) async {
+    setUploading(true);
     try {
-      setUploading(true);
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) throw Exception("User not authenticated");
 
       final storage = FirebaseStorage.instance;
-      final firestore = FirebaseFirestore.instance;
-      final docRef = firestore.collection('drivers').doc(user.uid);
+      final docRef = FirebaseFirestore.instance
+          .collection('drivers')
+          .doc(user.uid);
 
       Map<String, String> docPaths = {};
-
       if (drivingLicenseFile != null) {
         final dlPath = 'driver_docs/${user.uid}/driving_license.jpg';
         await storage.ref(dlPath).putFile(drivingLicenseFile);
@@ -201,37 +219,55 @@ class DriverRegistrationProvider with ChangeNotifier {
       }
 
       if (docPaths.isNotEmpty) {
+        // Save uploaded paths
         await docRef.update(docPaths);
+
+        // Check if all required docs are present
+        final snapshot = await docRef.get();
+        final data = snapshot.data() ?? {};
+
+        final hasDL = data['driving_license_path'] != null;
+        final hasNP = data['number_plate_path'] != null;
+        final hasRC = data['rc_path'] != null;
+
+        final status = (hasDL && hasNP && hasRC) ? 'pending' : 'incomplete';
+
+        await docRef.update({'registration_status': status});
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Documents uploaded successfully!')),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Documents uploaded successfully!')),
+        );
+      }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Failed to upload documents: $e')));
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to upload documents: $e')),
+        );
+      }
     } finally {
       setUploading(false);
     }
   }
 
+  /// --- ADDITIONAL DOCS UPLOAD ---
   Future<void> uploadAdditionalDriverDocuments({
     required File? insuranceCopyFile,
     required File? pollutionCertificateFile,
     required BuildContext context,
   }) async {
+    setUploading(true);
     try {
-      setUploading(true);
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) throw Exception("User not authenticated");
 
       final storage = FirebaseStorage.instance;
-      final firestore = FirebaseFirestore.instance;
-      final docRef = firestore.collection('drivers').doc(user.uid);
+      final docRef = FirebaseFirestore.instance
+          .collection('drivers')
+          .doc(user.uid);
 
       Map<String, String> docPaths = {};
-
       if (insuranceCopyFile != null) {
         final insurancePath = 'driver_docs/${user.uid}/insurance_copy.jpg';
         await storage.ref(insurancePath).putFile(insuranceCopyFile);
@@ -246,17 +282,22 @@ class DriverRegistrationProvider with ChangeNotifier {
 
       if (docPaths.isNotEmpty) {
         await docRef.update(docPaths);
+        // Additional docs do NOT affect registration status
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Additional documents uploaded successfully!'),
-        ),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Additional documents uploaded successfully!'),
+          ),
+        );
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to upload additional documents: $e')),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to upload additional documents: $e')),
+        );
+      }
     } finally {
       setUploading(false);
     }

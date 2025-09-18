@@ -1,3 +1,4 @@
+import 'package:cab_booking_user/screens/auth/driver/admin_rejected_profile.dart';
 import 'package:cab_booking_user/screens/auth/driver/driver_vehicle_registration_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,6 +8,12 @@ import 'package:cab_booking_user/Widgets/info_box/info_dialog.dart';
 import 'package:cab_booking_user/utils/constants.dart';
 import 'package:cab_booking_user/providers/driver_registration_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+// Note: This import should not contain a class with the same name
+// If 'DriverProfileCreatedScreen' is also in 'user_choice.dart', hide it.
+import 'package:cab_booking_user/screens/user_choice.dart'
+    hide DriverProfileCreatedScreen;
 
 class DriverProfileCreatedScreen extends ConsumerStatefulWidget {
   const DriverProfileCreatedScreen({Key? key}) : super(key: key);
@@ -18,14 +25,69 @@ class DriverProfileCreatedScreen extends ConsumerStatefulWidget {
 
 class _DriverProfileCreatedScreenState
     extends ConsumerState<DriverProfileCreatedScreen> {
+  bool _isCheckingStatus = true;
+
   @override
   void initState() {
     super.initState();
+    _checkDriverStatus();
     ref.read(driverRegistrationProvider).fetchProfileImage(context);
+  }
+
+  Future<void> _checkDriverStatus() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      if (mounted) {
+        // Handle unauthenticated user if needed
+        setState(() {
+          _isCheckingStatus = false;
+        });
+      }
+      return;
+    }
+
+    try {
+      final doc =
+          await FirebaseFirestore.instance
+              .collection('drivers')
+              .doc(user.uid)
+              .get();
+      final status = doc.data()?['registration_status'];
+
+      if (status == 'rejected') {
+        if (mounted) {
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+              builder: (context) => const AdminRejectedProfileScreen(),
+            ),
+            (Route<dynamic> route) => false,
+          );
+        }
+      } else {
+        if (mounted) {
+          setState(() {
+            _isCheckingStatus = false;
+          });
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isCheckingStatus = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to check driver status: $e')),
+        );
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_isCheckingStatus) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
     final provider = ref.watch(driverRegistrationProvider);
 
     return Scaffold(
@@ -77,9 +139,8 @@ class _DriverProfileCreatedScreenState
             Container(
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
-                color: dialogBackgroundColor, // Background color
-                borderRadius: BorderRadius.circular(8.0), // Rounded corners
-                // Border styling
+                color: dialogBackgroundColor,
+                borderRadius: BorderRadius.circular(8.0),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -92,7 +153,7 @@ class _DriverProfileCreatedScreenState
                       fontWeight: FontWeight.w400,
                     ),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Center(
                     child: Text(
                       'All it takes is 3 easy steps!',

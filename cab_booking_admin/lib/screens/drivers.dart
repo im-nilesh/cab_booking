@@ -72,7 +72,8 @@ class DriversPage extends ConsumerWidget {
 
     if (status == 'rejected') {
       return const DataCell(Row(children: []));
-    } else if (status == 'incomplete') {
+    } else if (status == 'incomplete' || status == 'pending') {
+      // ✅ Show approve + reject for both "incomplete" and "pending"
       return DataCell(
         Row(
           children: [
@@ -219,12 +220,16 @@ class DriversPage extends ConsumerWidget {
                             _buildDocCells(context, ref, driver),
                             DataCell(
                               Text(
-                                driver['status']!,
+                                driver['registration_status']!,
                                 style: TextStyle(
                                   color:
-                                      driver['status'] == "active"
+                                      driver['registration_status'] ==
+                                              "complete"
                                           ? Colors.green
-                                          : Colors.red,
+                                          : (driver['registration_status'] ==
+                                                  "rejected"
+                                              ? Colors.red
+                                              : Colors.orange),
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),

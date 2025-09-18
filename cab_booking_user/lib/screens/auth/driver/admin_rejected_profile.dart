@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cab_booking_user/Widgets/button/primary_button.dart';
 import 'package:cab_booking_user/utils/constants.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:cab_booking_user/screens/auth/driver/driver_name_collect_screen.dart'; // Import the start of the registration flow
 
 class AdminRejectedProfileScreen extends StatelessWidget {
   const AdminRejectedProfileScreen({Key? key}) : super(key: key);
@@ -14,14 +15,9 @@ class AdminRejectedProfileScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(height: 220), // Adjusted top spacing
-            // Illustration
-            Image.asset(
-              'assets/images/Frame34845.png', // Replace with your asset path
-              height: 250,
-            ),
+            const SizedBox(height: 220),
+            Image.asset('assets/images/Frame34845.png', height: 250),
             const SizedBox(height: 30),
-            // Rejection Message
             Text(
               'We are sorry to say',
               style: GoogleFonts.outfit(
@@ -41,7 +37,6 @@ class AdminRejectedProfileScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 30),
-            // Customer Care Info
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
@@ -79,20 +74,24 @@ class AdminRejectedProfileScreen extends StatelessWidget {
               ),
             ),
             const Spacer(),
-            // Try Again Button
             SizedBox(
               width: double.infinity,
               height: MediaQuery.of(context).size.height * 0.06,
               child: PrimaryButton(
                 text: 'Try again',
                 onPressed: () {
-                  // Handle retry action
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                      builder: (context) => const DriverNameCollectScreen(),
+                    ),
+                    (Route<dynamic> route) => false,
+                  );
                 },
                 backgroundColor: greencolor,
                 textColor: Colors.white,
               ),
             ),
-            const SizedBox(height: 60), // Adjusted bottom spacing
+            const SizedBox(height: 60),
           ],
         ),
       ),

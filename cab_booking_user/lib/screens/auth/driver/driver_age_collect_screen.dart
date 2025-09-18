@@ -1,3 +1,5 @@
+// lib/screens/auth/driver/driver_age_collect_screen.dart
+
 import 'package:cab_booking_user/providers/driver_registration_provider.dart';
 import 'package:cab_booking_user/Widgets/progress_bar/custom_progress_bar.dart';
 import 'package:cab_booking_user/Widgets/textfield/custom_text_field.dart';
@@ -40,28 +42,30 @@ class _DriverRegistrationScreen2State
     try {
       final age = int.tryParse(_ageController.text);
       if (age == null || age <= 0) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please enter a valid age')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Please enter a valid age')),
+          );
+        }
         return;
       }
-
-      // Update the age in Firestore
       await ref
           .read(driverRegistrationProvider)
           .updateDriverAge(age: age, context: context);
-
-      // Navigate to the next screen
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const DriverSelfieInstructionScreen(),
-        ),
-      );
+      if (mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const DriverSelfieInstructionScreen(),
+          ),
+        );
+      }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Failed to update age: $e')));
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to update age: $e')));
+      }
     }
   }
 
@@ -88,15 +92,12 @@ class _DriverRegistrationScreen2State
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Progress Bar
-            CustomProgressBar(
+            const CustomProgressBar(
               currentStep: 2,
               totalSteps: 2,
               label: 'Basic Information',
             ),
             const SizedBox(height: 30),
-
-            // Title
             Text(
               "What's your age?",
               style: GoogleFonts.outfit(
@@ -106,12 +107,8 @@ class _DriverRegistrationScreen2State
               ),
             ),
             const SizedBox(height: 10),
-
-            // Age Field
             CustomTextField(controller: _ageController, hintText: 'Age'),
             const Spacer(),
-
-            // Next Button
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -120,12 +117,11 @@ class _DriverRegistrationScreen2State
                   height: MediaQuery.of(context).size.height * 0.07,
                   child: PrimaryButton(
                     text: 'Next',
+                    // Corrected: Pass a non-nullable function in both cases
                     onPressed:
                         _isButtonEnabled
-                            ? () {
-                              _handleNextButtonPress(context, ref);
-                            }
-                            : () {}, // Disable button if no age is entered
+                            ? () => _handleNextButtonPress(context, ref)
+                            : () {},
                   ),
                 ),
               ],
