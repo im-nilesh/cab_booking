@@ -1,4 +1,5 @@
 import 'package:cab_booking_user/navigations/user_navigations.dart';
+import 'package:cab_booking_user/navigations/driver_navigation.dart';
 import 'package:cab_booking_user/screens/auth/driver/admin_rejected_profile.dart';
 import 'package:cab_booking_user/screens/auth/driver/driver_registration_complete_screen.dart';
 import 'package:cab_booking_user/screens/auth/driver/driver_profile_created_screen.dart';
@@ -14,8 +15,26 @@ final authStateChangesProvider = StreamProvider<User?>((ref) {
   return FirebaseAuth.instance.authStateChanges();
 });
 
-/// Watches the user's registration status in Firestore
-final userStatusProvider = StreamProvider<String>((ref) {
+/// Checks if logged-in user exists in "users" or "drivers"
+final userRoleProvider = FutureProvider<String>((ref) async {
+  final user = FirebaseAuth.instance.currentUser;
+  if (user == null) return "unauthenticated";
+
+  final uid = user.uid;
+
+  final userDoc =
+      await FirebaseFirestore.instance.collection('users').doc(uid).get();
+  if (userDoc.exists) return "user";
+
+  final driverDoc =
+      await FirebaseFirestore.instance.collection('drivers').doc(uid).get();
+  if (driverDoc.exists) return "driver";
+
+  return "new_user"; // brand new, no entry in either collection
+});
+
+/// Watches only the driver's registration status in Firestore
+final driverStatusProvider = StreamProvider<String>((ref) {
   final user = FirebaseAuth.instance.currentUser;
   if (user == null) {
     return Stream.value('unauthenticated');
@@ -26,7 +45,7 @@ final userStatusProvider = StreamProvider<String>((ref) {
       .doc(user.uid)
       .snapshots()
       .map((doc) {
-        if (!doc.exists) return 'new_user';
+        if (!doc.exists) return 'new_driver';
         final data = doc.data() as Map<String, dynamic>;
         final status = data['registration_status'] ?? 'incomplete';
 
@@ -198,14 +217,13 @@ final authProvider = StateNotifierProvider<AuthNotifier, AuthProvider>((ref) {
   return AuthNotifier();
 });
 
-/// AuthGate decides where user goes based on status
+/// AuthGate decides where user goes based on role + status
 class AuthGate extends ConsumerWidget {
   const AuthGate({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authStateChangesProvider);
-    final userStatus = ref.watch(userStatusProvider);
 
     return authState.when(
       data: (user) {
@@ -214,23 +232,49 @@ class AuthGate extends ConsumerWidget {
             body: Center(child: Text('Login Screen Placeholder')),
           );
         } else {
-          return userStatus.when(
-            data: (status) {
-              switch (status) {
-                case 'new_user':
-                  return const UserChoice(); // must exist
-                case 'incomplete':
-                  return const DriverProfileCreatedScreen();
-                case 'pending':
-                  return const DriverRegistrationCompleteScreen();
-                case 'rejected':
-                  return const AdminRejectedProfileScreen();
-                case 'complete':
-                  return const UserNavigation();
-                default:
-                  return const Scaffold(
-                    body: Center(child: Text('Unknown Status')),
-                  );
+          final roleAsync = ref.watch(userRoleProvider);
+          return roleAsync.when(
+            data: (role) {
+              if (role == "user") {
+                return const UserNavigation();
+              } else if (role == "driver") {
+                final driverStatus = ref.watch(driverStatusProvider);
+                return driverStatus.when(
+                  data: (status) {
+                    switch (status) {
+                      case 'new_driver':
+                        return const UserChoice(); // choose role
+                      case 'incomplete':
+                        return const DriverProfileCreatedScreen();
+                      case 'pending':
+                        return const DriverRegistrationCompleteScreen();
+                      case 'rejected':
+                        return const AdminRejectedProfileScreen();
+                      case 'complete':
+                        return const DriverNavigation();
+                      default:
+                        return const Scaffold(
+                          body: Center(child: Text('Unknown driver status')),
+                        );
+                    }
+                  },
+                  loading:
+                      () => const Scaffold(
+                        body: Center(child: CircularProgressIndicator()),
+                      ),
+                  error:
+                      (_, __) => const Scaffold(
+                        body: Center(
+                          child: Text('Error fetching driver status'),
+                        ),
+                      ),
+                );
+              } else if (role == "new_user") {
+                return const UserChoice();
+              } else {
+                return const Scaffold(
+                  body: Center(child: Text('Unknown role')),
+                );
               }
             },
             loading:
@@ -239,7 +283,7 @@ class AuthGate extends ConsumerWidget {
                 ),
             error:
                 (_, __) => const Scaffold(
-                  body: Center(child: Text('Error fetching status')),
+                  body: Center(child: Text('Error fetching role')),
                 ),
           );
         }

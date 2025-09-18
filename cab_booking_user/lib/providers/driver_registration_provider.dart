@@ -31,7 +31,7 @@ class DriverRegistrationProvider with ChangeNotifier {
   Future<void> saveDriverDetails({
     required String firstName,
     required String lastName,
-    required BuildContext context,
+    required BuildContext context, // Added context parameter
   }) async {
     try {
       final user = FirebaseAuth.instance.currentUser;
@@ -62,7 +62,7 @@ class DriverRegistrationProvider with ChangeNotifier {
 
   Future<void> updateDriverAge({
     required int age,
-    required BuildContext context,
+    required BuildContext context, // Added context parameter
   }) async {
     try {
       final user = FirebaseAuth.instance.currentUser;
@@ -89,7 +89,7 @@ class DriverRegistrationProvider with ChangeNotifier {
 
   Future<void> uploadDriverPhoto({
     required String photoPath,
-    required BuildContext context,
+    required BuildContext context, // Added context parameter
   }) async {
     setUploading(true);
     try {
@@ -154,7 +154,7 @@ class DriverRegistrationProvider with ChangeNotifier {
 
   Future<void> saveVehicleNumber({
     required String vehicleNumber,
-    required BuildContext context,
+    required BuildContext context, // Added context parameter
   }) async {
     try {
       final user = FirebaseAuth.instance.currentUser;
@@ -184,23 +184,20 @@ class DriverRegistrationProvider with ChangeNotifier {
     }
   }
 
-  /// --- MAIN DOCS UPLOAD ---
   Future<void> uploadDriverDocuments({
     required File? drivingLicenseFile,
     required File? vehicleNumberPlateFile,
     required File? rcFile,
-    required BuildContext context,
+    required BuildContext context, // Added context parameter
   }) async {
     setUploading(true);
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) throw Exception("User not authenticated");
-
       final storage = FirebaseStorage.instance;
       final docRef = FirebaseFirestore.instance
           .collection('drivers')
           .doc(user.uid);
-
       Map<String, String> docPaths = {};
       if (drivingLicenseFile != null) {
         final dlPath = 'driver_docs/${user.uid}/driving_license.jpg';
@@ -217,24 +214,9 @@ class DriverRegistrationProvider with ChangeNotifier {
         await storage.ref(rcPath).putFile(rcFile);
         docPaths['rc_path'] = rcPath;
       }
-
       if (docPaths.isNotEmpty) {
-        // Save uploaded paths
         await docRef.update(docPaths);
-
-        // Check if all required docs are present
-        final snapshot = await docRef.get();
-        final data = snapshot.data() ?? {};
-
-        final hasDL = data['driving_license_path'] != null;
-        final hasNP = data['number_plate_path'] != null;
-        final hasRC = data['rc_path'] != null;
-
-        final status = (hasDL && hasNP && hasRC) ? 'pending' : 'incomplete';
-
-        await docRef.update({'registration_status': status});
       }
-
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Documents uploaded successfully!')),
@@ -251,22 +233,19 @@ class DriverRegistrationProvider with ChangeNotifier {
     }
   }
 
-  /// --- ADDITIONAL DOCS UPLOAD ---
   Future<void> uploadAdditionalDriverDocuments({
     required File? insuranceCopyFile,
     required File? pollutionCertificateFile,
-    required BuildContext context,
+    required BuildContext context, // Added context parameter
   }) async {
     setUploading(true);
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) throw Exception("User not authenticated");
-
       final storage = FirebaseStorage.instance;
       final docRef = FirebaseFirestore.instance
           .collection('drivers')
           .doc(user.uid);
-
       Map<String, String> docPaths = {};
       if (insuranceCopyFile != null) {
         final insurancePath = 'driver_docs/${user.uid}/insurance_copy.jpg';
@@ -279,12 +258,9 @@ class DriverRegistrationProvider with ChangeNotifier {
         await storage.ref(pollutionPath).putFile(pollutionCertificateFile);
         docPaths['pollution_certificate_path'] = pollutionPath;
       }
-
       if (docPaths.isNotEmpty) {
         await docRef.update(docPaths);
-        // Additional docs do NOT affect registration status
       }
-
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
