@@ -6,12 +6,14 @@ class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
   final TextInputType keyboardType;
+  final FocusNode? focusNode; // 👈 add this
 
   const CustomTextField({
     Key? key,
     required this.controller,
     required this.hintText,
     this.keyboardType = TextInputType.text,
+    this.focusNode, // 👈 add this
   }) : super(key: key);
 
   @override
@@ -19,6 +21,7 @@ class CustomTextField extends StatelessWidget {
     return TextField(
       controller: controller,
       keyboardType: keyboardType,
+      focusNode: focusNode, // 👈 use it here
       decoration: InputDecoration(
         hintText: '  $hintText',
         hintStyle: GoogleFonts.outfit(color: hintColor),

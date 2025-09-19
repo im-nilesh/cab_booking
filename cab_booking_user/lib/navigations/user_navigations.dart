@@ -17,10 +17,11 @@ class UserNavigation extends StatefulWidget {
 class _UserNavigationState extends State<UserNavigation> {
   int _selectedIndex = 0;
 
-  static const List<Widget> _widgetOptions = <Widget>[
-    HomePage(),
-    SearchPage(),
-    ProfilePage(),
+  // ✅ Make the list non-static, final, and remove const for SearchPage
+  late final List<Widget> _widgetOptions = <Widget>[
+    const HomePage(),
+    SearchPage(), // ConsumerStatefulWidget → cannot be const
+    const ProfilePage(),
   ];
 
   void _onItemTapped(int index) {
@@ -32,7 +33,7 @@ class _UserNavigationState extends State<UserNavigation> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(child: _widgetOptions.elementAt(_selectedIndex)),
+      body: _widgetOptions[_selectedIndex],
       bottomNavigationBar: Container(
         height: 80,
         decoration: BoxDecoration(
