@@ -1,3 +1,4 @@
+import 'package:cab_booking_user/Widgets/title/location_suggestion_title_widget.dart';
 import 'package:cab_booking_user/components/users/search%20components/top_search_container.dart';
 import 'package:cab_booking_user/components/users/search%20components/no_rides_found.dart';
 import 'package:cab_booking_user/providers/destination_provider.dart';
@@ -17,6 +18,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   final TextEditingController _destinationController = TextEditingController();
   final FocusNode _originFocus = FocusNode();
   final FocusNode _destinationFocus = FocusNode();
+
+  String? selectedOriginCity;
+  String? selectedDestinationCity;
 
   @override
   void initState() {
@@ -62,84 +66,86 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             },
           ),
           Expanded(
-            child: Builder(
-              builder: (_) {
-                // Show origin suggestions
-                if (showOriginSuggestions) {
-                  return originSuggestionsAsync.when(
-                    data: (suggestions) {
-                      if (suggestions.isEmpty) {
-                        return const NoRidesFound();
-                      }
-                      return ListView.builder(
-                        itemCount: suggestions.length,
-                        itemBuilder: (context, index) {
-                          final item = suggestions[index];
-                          final city = item['cityOne'];
-                          final areas = item['areas'] as List<String>;
-                          return ListTile(
-                            title: Text(city),
-                            subtitle:
-                                areas.isNotEmpty
-                                    ? Text(areas.join(', '))
-                                    : null,
-                            onTap: () {
-                              _originController.text = city;
-                              _originFocus.unfocus();
-                            },
-                          );
-                        },
-                      );
-                    },
-                    loading:
-                        () => const Center(child: CircularProgressIndicator()),
-                    error:
-                        (e, _) => const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text('Error loading origin cities'),
-                        ),
-                  );
-                }
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Origin suggestions
+                  if (showOriginSuggestions)
+                    originSuggestionsAsync.when(
+                      data: (suggestions) {
+                        if (suggestions.isEmpty) return const NoRidesFound();
+                        final tiles = <Widget>[];
+                        for (final item in suggestions) {
+                          final city = item['cityOne'] as String? ?? '';
+                          final areas = (item['areas'] as List).cast<String>();
+                          for (final area in areas) {
+                            tiles.add(
+                              LocationSuggestionTile(
+                                city: city,
+                                address: area,
+                                onTap: () {
+                                  _originController.text = "$area, $city";
+                                  selectedOriginCity = city;
+                                  _originFocus.unfocus();
+                                  setState(() {});
+                                },
+                              ),
+                            );
+                          }
+                        }
+                        return Column(children: tiles);
+                      },
+                      loading:
+                          () =>
+                              const Center(child: CircularProgressIndicator()),
+                      error:
+                          (e, _) => const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text('Error loading origin cities'),
+                          ),
+                    ),
 
-                // Show destination suggestions
-                if (showDestinationSuggestions) {
-                  return destinationSuggestionsAsync.when(
-                    data: (suggestions) {
-                      if (suggestions.isEmpty) {
-                        return const NoRidesFound();
-                      }
-                      return ListView.builder(
-                        itemCount: suggestions.length,
-                        itemBuilder: (context, index) {
-                          final item = suggestions[index];
-                          final city = item['cityTwo'];
-                          final areas = item['areas'] as List<String>;
-                          return ListTile(
-                            title: Text(city),
-                            subtitle:
-                                areas.isNotEmpty
-                                    ? Text(areas.join(', '))
-                                    : null,
-                            onTap: () {
-                              _destinationController.text = city;
-                              _destinationFocus.unfocus();
-                            },
-                          );
-                        },
-                      );
-                    },
-                    loading:
-                        () => const Center(child: CircularProgressIndicator()),
-                    error:
-                        (e, _) => const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text('Error loading destination cities'),
-                        ),
-                  );
-                }
+                  // Destination suggestions
+                  if (showDestinationSuggestions)
+                    destinationSuggestionsAsync.when(
+                      data: (suggestions) {
+                        if (suggestions.isEmpty) return const NoRidesFound();
+                        final tiles = <Widget>[];
+                        for (final item in suggestions) {
+                          final city = item['cityTwo'] as String? ?? '';
+                          final areas = (item['areas'] as List).cast<String>();
+                          for (final area in areas) {
+                            tiles.add(
+                              LocationSuggestionTile(
+                                city: city,
+                                address: area,
+                                onTap: () {
+                                  _destinationController.text = "$area, $city";
+                                  selectedDestinationCity = city;
+                                  _destinationFocus.unfocus();
+                                  setState(() {});
+                                },
+                              ),
+                            );
+                          }
+                        }
+                        return Column(children: tiles);
+                      },
+                      loading:
+                          () =>
+                              const Center(child: CircularProgressIndicator()),
+                      error:
+                          (e, _) => const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text('Error loading destination cities'),
+                          ),
+                    ),
 
-                return const NoRidesFound();
-              },
+                  if (!showOriginSuggestions && !showDestinationSuggestions)
+                    const NoRidesFound(),
+                ],
+              ),
             ),
           ),
         ],

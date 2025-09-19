@@ -10,7 +10,6 @@ final originSuggestionsProvider = StreamProvider<List<Map<String, dynamic>>>((
 ) {
   final query = ref.watch(originQueryProvider).trim().toLowerCase();
 
-  // Firestore stream for locations collection
   final stream = FirebaseFirestore.instance.collection('locations').snapshots();
 
   return stream.map((snapshot) {
