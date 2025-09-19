@@ -1,5 +1,6 @@
 import 'package:cab_booking_user/components/users/search%20components/top_search_container.dart';
 import 'package:cab_booking_user/components/users/search%20components/no_rides_found.dart';
+import 'package:cab_booking_user/providers/destination_provider.dart';
 import 'package:cab_booking_user/providers/origin_query_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -36,10 +37,14 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   @override
   Widget build(BuildContext context) {
     final originSuggestionsAsync = ref.watch(originSuggestionsProvider);
+    final destinationSuggestionsAsync = ref.watch(
+      destinationSuggestionsProvider,
+    );
 
-    // Determine if we should show suggestions list
-    final showSuggestions =
+    final showOriginSuggestions =
         _originFocus.hasFocus && _originController.text.isNotEmpty;
+    final showDestinationSuggestions =
+        _destinationFocus.hasFocus && _destinationController.text.isNotEmpty;
 
     return Scaffold(
       body: Column(
@@ -52,47 +57,88 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             onOriginChanged: (value) {
               ref.read(originQueryProvider.notifier).state = value;
             },
+            onDestinationChanged: (value) {
+              ref.read(destinationQueryProvider.notifier).state = value;
+            },
           ),
           Expanded(
             child: Builder(
               builder: (_) {
-                // If nothing typed yet, show NoRidesFound
-                if (_originController.text.isEmpty) {
-                  return const NoRidesFound();
+                // Show origin suggestions
+                if (showOriginSuggestions) {
+                  return originSuggestionsAsync.when(
+                    data: (suggestions) {
+                      if (suggestions.isEmpty) {
+                        return const NoRidesFound();
+                      }
+                      return ListView.builder(
+                        itemCount: suggestions.length,
+                        itemBuilder: (context, index) {
+                          final item = suggestions[index];
+                          final city = item['cityOne'];
+                          final areas = item['areas'] as List<String>;
+                          return ListTile(
+                            title: Text(city),
+                            subtitle:
+                                areas.isNotEmpty
+                                    ? Text(areas.join(', '))
+                                    : null,
+                            onTap: () {
+                              _originController.text = city;
+                              _originFocus.unfocus();
+                            },
+                          );
+                        },
+                      );
+                    },
+                    loading:
+                        () => const Center(child: CircularProgressIndicator()),
+                    error:
+                        (e, _) => const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text('Error loading origin cities'),
+                        ),
+                  );
                 }
 
-                // Otherwise show suggestions from Firestore
-                return originSuggestionsAsync.when(
-                  data: (suggestions) {
-                    if (suggestions.isEmpty) {
-                      return const NoRidesFound();
-                    }
-                    return ListView.builder(
-                      itemCount: suggestions.length,
-                      itemBuilder: (context, index) {
-                        final item = suggestions[index];
-                        final city = item['cityOne'];
-                        final areas = item['areas'] as List<String>;
-                        return ListTile(
-                          title: Text(city),
-                          subtitle:
-                              areas.isNotEmpty ? Text(areas.join(', ')) : null,
-                          onTap: () {
-                            _originController.text = city;
-                            _originFocus.unfocus();
-                          },
-                        );
-                      },
-                    );
-                  },
-                  loading:
-                      () => const Center(child: CircularProgressIndicator()),
-                  error:
-                      (e, _) => const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text('Error loading cities'),
-                      ),
-                );
+                // Show destination suggestions
+                if (showDestinationSuggestions) {
+                  return destinationSuggestionsAsync.when(
+                    data: (suggestions) {
+                      if (suggestions.isEmpty) {
+                        return const NoRidesFound();
+                      }
+                      return ListView.builder(
+                        itemCount: suggestions.length,
+                        itemBuilder: (context, index) {
+                          final item = suggestions[index];
+                          final city = item['cityTwo'];
+                          final areas = item['areas'] as List<String>;
+                          return ListTile(
+                            title: Text(city),
+                            subtitle:
+                                areas.isNotEmpty
+                                    ? Text(areas.join(', '))
+                                    : null,
+                            onTap: () {
+                              _destinationController.text = city;
+                              _destinationFocus.unfocus();
+                            },
+                          );
+                        },
+                      );
+                    },
+                    loading:
+                        () => const Center(child: CircularProgressIndicator()),
+                    error:
+                        (e, _) => const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text('Error loading destination cities'),
+                        ),
+                  );
+                }
+
+                return const NoRidesFound();
               },
             ),
           ),

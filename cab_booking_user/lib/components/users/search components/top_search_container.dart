@@ -1,4 +1,4 @@
-import 'package:cab_booking_user/Widgets/textfield/custom_text_field.dart';
+import 'package:cab_booking_user/Widgets/textfield/custom_text_field_dynamic.dart';
 import 'package:cab_booking_user/utils/constants.dart';
 import 'package:flutter/material.dart';
 
@@ -10,7 +10,8 @@ class TopSearchContainer extends StatelessWidget {
   final TextEditingController destinationController;
   final FocusNode originFocus;
   final FocusNode destinationFocus;
-  final ValueChanged<String>? onOriginChanged; // Callback for Riverpod
+  final ValueChanged<String>? onOriginChanged;
+  final ValueChanged<String>? onDestinationChanged; // ✅ new
 
   const TopSearchContainer({
     super.key,
@@ -19,6 +20,7 @@ class TopSearchContainer extends StatelessWidget {
     required this.originFocus,
     required this.destinationFocus,
     this.onOriginChanged,
+    this.onDestinationChanged, // ✅ new
   });
 
   @override
@@ -46,18 +48,18 @@ class TopSearchContainer extends StatelessWidget {
               Expanded(
                 child: Column(
                   children: [
-                    CustomTextField(
+                    CustomTextFieldDynamic(
                       controller: originController,
                       hintText: 'Enter origin',
                       focusNode: originFocus,
-                      onChanged:
-                          onOriginChanged, // send text changes to provider
+                      onChanged: onOriginChanged,
                     ),
                     const SizedBox(height: 12),
-                    CustomTextField(
+                    CustomTextFieldDynamic(
                       controller: destinationController,
                       hintText: 'Enter destination',
                       focusNode: destinationFocus,
+                      onChanged: onDestinationChanged, // ✅ now dynamic
                     ),
                   ],
                 ),
