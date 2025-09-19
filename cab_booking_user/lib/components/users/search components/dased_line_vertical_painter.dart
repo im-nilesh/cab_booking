@@ -16,7 +16,7 @@ class DashedLineVerticalPainter extends StatelessWidget {
 class _DashedLinePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    double dashHeight = 5, dashSpace = 3, startY = 0;
+    double dashHeight = 7, dashSpace = 3, startY = 0;
     final paint =
         Paint()
           ..color = whiteColor

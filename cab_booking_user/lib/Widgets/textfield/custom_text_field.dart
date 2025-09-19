@@ -13,7 +13,8 @@ class CustomTextField extends StatelessWidget {
     required this.controller,
     required this.hintText,
     this.keyboardType = TextInputType.text,
-    this.focusNode, // 👈 add this
+    this.focusNode,
+    Function(String p1)? onChanged, // 👈 add this
   }) : super(key: key);
 
   @override

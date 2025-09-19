@@ -1,7 +1,8 @@
-import 'package:cab_booking_user/components/users/search%20components/now_chip.dart';
-import 'package:flutter/material.dart';
-import 'package:cab_booking_user/utils/constants.dart';
 import 'package:cab_booking_user/Widgets/textfield/custom_text_field.dart';
+import 'package:cab_booking_user/utils/constants.dart';
+import 'package:flutter/material.dart';
+
+import 'now_chip.dart';
 import 'location_connector.dart';
 
 class TopSearchContainer extends StatelessWidget {
@@ -9,6 +10,7 @@ class TopSearchContainer extends StatelessWidget {
   final TextEditingController destinationController;
   final FocusNode originFocus;
   final FocusNode destinationFocus;
+  final ValueChanged<String>? onOriginChanged; // Callback for Riverpod
 
   const TopSearchContainer({
     super.key,
@@ -16,6 +18,7 @@ class TopSearchContainer extends StatelessWidget {
     required this.destinationController,
     required this.originFocus,
     required this.destinationFocus,
+    this.onOriginChanged,
   });
 
   @override
@@ -31,10 +34,7 @@ class TopSearchContainer extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Align(
-            alignment: Alignment.topRight,
-            child: Container(child: NowButton()),
-          ),
+          Align(alignment: Alignment.topRight, child: NowButton()),
           const SizedBox(height: 15),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -50,6 +50,8 @@ class TopSearchContainer extends StatelessWidget {
                       controller: originController,
                       hintText: 'Enter origin',
                       focusNode: originFocus,
+                      onChanged:
+                          onOriginChanged, // send text changes to provider
                     ),
                     const SizedBox(height: 12),
                     CustomTextField(
