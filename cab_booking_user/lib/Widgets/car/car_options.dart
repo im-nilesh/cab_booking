@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cab_booking_user/utils/constants.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class CarOptionCard extends StatelessWidget {
   final String imagePath;
@@ -18,43 +20,60 @@ class CarOptionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return InkWell(
       onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
       child: Container(
-        width: 140,
-        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-        padding: const EdgeInsets.all(12),
+        margin: const EdgeInsets.symmetric(vertical: 6.0),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.green.shade50 : Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          color: isSelected ? greencolor.withOpacity(0.1) : Colors.white,
+          borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? Colors.green : Colors.grey.shade300,
-            width: 2,
+            color: isSelected ? greencolor : Colors.grey.shade300,
+            width: 1.5,
           ),
           boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 6,
-              offset: const Offset(0, 3),
-            ),
+            if (!isSelected)
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 5,
+                offset: const Offset(0, 2),
+              ),
           ],
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: Row(
           children: [
-            Image.asset(imagePath, height: 60, fit: BoxFit.contain),
-            const SizedBox(height: 8),
+            Image.asset(
+              imagePath,
+              height: 40,
+              width: 80,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) {
+                // Placeholder in case image fails to load
+                return const Icon(
+                  Icons.directions_car,
+                  size: 40,
+                  color: Colors.grey,
+                );
+              },
+            ),
+            const SizedBox(width: 16),
             Text(
               carName,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+              style: GoogleFonts.outfit(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: blackColor,
+              ),
             ),
-            const SizedBox(height: 6),
+            const Spacer(),
             Text(
               price > 0 ? "₹ $price" : "N/A",
-              style: const TextStyle(
-                fontSize: 14,
+              style: GoogleFonts.outfit(
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.black87,
+                color: blackColor,
               ),
             ),
           ],
