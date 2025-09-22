@@ -1,5 +1,6 @@
 import 'package:cab_booking_admin/provider/driver_provider.dart';
 import 'package:cab_booking_admin/components/dialog_document.dart';
+import 'package:cab_booking_admin/widgets/approval_buttons.dart';
 import 'package:cab_booking_admin/widgets/custom_table.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -73,31 +74,21 @@ class DriversPage extends ConsumerWidget {
     if (status == 'rejected') {
       return const DataCell(Row(children: []));
     } else if (status == 'incomplete' || status == 'pending') {
-      // Show approve + reject buttons
+      // Use reusable ApprovalButtons widget
       return DataCell(
-        Row(
-          children: [
-            IconButton(
-              icon: const Icon(Icons.close, color: Colors.red),
-              tooltip: 'Reject Registration',
-              onPressed: () async {
-                await driverActions.updateRegistrationStatus(
-                  driver['id']!,
-                  'rejected',
-                );
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.check, color: Colors.green),
-              tooltip: 'Approve Registration',
-              onPressed: () async {
-                await driverActions.updateRegistrationStatus(
-                  driver['id']!,
-                  'approved', // ✅ Updated to match AuthGate
-                );
-              },
-            ),
-          ],
+        ApprovalButtons(
+          onApprove: () async {
+            await driverActions.updateRegistrationStatus(
+              driver['id']!,
+              'approved',
+            );
+          },
+          onReject: () async {
+            await driverActions.updateRegistrationStatus(
+              driver['id']!,
+              'rejected',
+            );
+          },
         ),
       );
     } else {

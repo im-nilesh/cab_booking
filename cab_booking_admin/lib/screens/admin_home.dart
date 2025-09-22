@@ -1,3 +1,5 @@
+import 'package:cab_booking_admin/screens/booked_rides.dart';
+import 'package:cab_booking_admin/screens/failed_rides.dart';
 import 'package:flutter/material.dart';
 import 'package:cab_booking_admin/widgets/custom_admin_sidebar.dart';
 import 'package:cab_booking_admin/screens/users.dart';
@@ -17,8 +19,8 @@ class _AdminHomeState extends State<AdminHome> {
   final List<Widget> _pages = [
     UsersPage(), // 0: Users
     DriversPage(), // 1: Drivers
-    Center(child: Text("Booked Rides Page")), // 2: Booked Rides
-    Center(child: Text("Failed Rides Page")), // 3: Failed Rides
+    BookedRidesScreen(), // 2: Booked Rides
+    FailedRidesScreen(), // 3: Failed Rides
     Center(child: Text("Pooled Users Page")), // 4: Pooled Users
     Center(child: Text("Pooling Rides Page")), // 5: Pooling Rides
     LocationScreen(), // 6: Locations
