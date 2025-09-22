@@ -1,7 +1,7 @@
 22-09-25
 
-1. Fix search API
-2. Integrate razorpay payment gateway and book rides
+1. Fix search API - done
+2. create booked ride ui and udpate status on firebase - done
 3. show booked rides on admin
 4. Appove rides on admin
 

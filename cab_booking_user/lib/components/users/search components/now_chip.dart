@@ -3,7 +3,8 @@ import 'package:cab_booking_user/utils/constants.dart';
 import 'package:intl/intl.dart'; // for formatting date/time
 
 class NowButton extends StatefulWidget {
-  const NowButton({super.key});
+  final ValueChanged<DateTime>? onDateTimeChanged;
+  const NowButton({super.key, this.onDateTimeChanged});
 
   @override
   State<NowButton> createState() => _NowButtonState();
@@ -76,6 +77,8 @@ class _NowButtonState extends State<NowButton> {
     setState(() {
       selectedDateTime = dateTime;
     });
+
+    widget.onDateTimeChanged?.call(dateTime);
 
     debugPrint("Selected DateTime: $selectedDateTime");
     // TODO: pass to state/provider if needed

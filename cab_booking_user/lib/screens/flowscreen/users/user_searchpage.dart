@@ -1,8 +1,9 @@
-import 'package:cab_booking_user/Widgets/car/car_option_list.dart';
-import 'package:cab_booking_user/Widgets/title/location_suggestion_list.dart';
-import 'package:cab_booking_user/components/users/search%20components/no_rides_found.dart';
+// lib/pages/search_page.dart (or wherever your original file is)
+
+import 'package:cab_booking_user/components/users/search%20components/booking_details.dart';
+import 'package:cab_booking_user/components/users/search%20components/search_body_content.dart';
 import 'package:cab_booking_user/components/users/search%20components/top_search_container.dart';
-import 'package:cab_booking_user/providers/location_provider.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -22,6 +23,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   String? selectedOriginCity;
   String? selectedDestinationCity;
   int? selectedCarIndex;
+  DateTime selectedDateTime = DateTime.now();
 
   @override
   void initState() {
@@ -43,6 +45,48 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     final cities = [c1.trim(), c2.trim()]
       ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
     return cities;
+  }
+
+  void _showBookingDetailsDialog(Map<String, dynamic> carDetails) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return BookingDetailsDialog(
+          origin: _originController.text,
+          destination: _destinationController.text,
+          dateTime: selectedDateTime,
+          carDetails: carDetails,
+        );
+      },
+    );
+  }
+
+  // Extracted logic into a dedicated method for clarity
+  void _onOriginSelect(String city, String area) {
+    setState(() {
+      _originController.text = "$area, $city";
+      selectedOriginCity = city.trim();
+      _originFocus.unfocus();
+    });
+  }
+
+  // Extracted logic into a dedicated method for clarity
+  void _onDestinationSelect(String city, String area) {
+    setState(() {
+      _destinationController.text = "$area, $city";
+      selectedDestinationCity = city.trim();
+      _destinationFocus.unfocus();
+    });
+  }
+
+  // Extracted logic into a dedicated method for clarity
+  void _onCarSelected(Map<String, dynamic> carDetails) {
+    setState(() {
+      selectedCarIndex = carDetails['index'];
+    });
+    _showBookingDetailsDialog(carDetails);
   }
 
   @override
@@ -74,51 +118,28 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               });
             },
             onDestinationChanged: (value) {
-              setState(() {}); // triggers rebuild and provider fetch
+              setState(() {});
+            },
+            onDateTimeChanged: (dateTime) {
+              setState(() {
+                selectedDateTime = dateTime;
+              });
             },
           ),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (showOriginSuggestions)
-                    LocationSuggestionsList(
-                      query: _originController.text,
-                      onSelect: (city, area) {
-                        _originController.text = "$area, $city";
-                        selectedOriginCity = city.trim();
-                        _originFocus.unfocus();
-                        setState(() {});
-                      },
-                    ),
-                  if (showDestinationSuggestions)
-                    LocationSuggestionsList(
-                      query: _destinationController.text,
-                      onSelect: (city, area) {
-                        _destinationController.text = "$area, $city";
-                        selectedDestinationCity = city.trim();
-                        _destinationFocus.unfocus();
-                        setState(() {});
-                      },
-                    ),
-                  if (showCarOptions)
-                    CarOptionsList(
-                      originCity: selectedOriginCity!,
-                      destinationCity: selectedDestinationCity!,
-                      selectedCarIndex: selectedCarIndex,
-                      onCarSelected:
-                          (index) => setState(() => selectedCarIndex = index),
-                      normalizeCities: normalizeCities,
-                    ),
-                  if (!showOriginSuggestions &&
-                      !showDestinationSuggestions &&
-                      !showCarOptions)
-                    const NoRidesFound(),
-                ],
-              ),
-            ),
+          // Use the new custom widget here
+          SearchBodyContent(
+            showOriginSuggestions: showOriginSuggestions,
+            showDestinationSuggestions: showDestinationSuggestions,
+            showCarOptions: showCarOptions,
+            originController: _originController,
+            destinationController: _destinationController,
+            selectedOriginCity: selectedOriginCity,
+            selectedDestinationCity: selectedDestinationCity,
+            selectedCarIndex: selectedCarIndex,
+            onOriginSelect: _onOriginSelect,
+            onDestinationSelect: _onDestinationSelect,
+            onCarSelected: _onCarSelected,
+            normalizeCities: normalizeCities,
           ),
         ],
       ),

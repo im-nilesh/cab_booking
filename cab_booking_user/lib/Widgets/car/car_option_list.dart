@@ -1,4 +1,4 @@
-import 'package:cab_booking_user/Widgets/car/car_options.dart';
+import 'package:cab_booking_user/Widgets/car/car_options_card.dart';
 import 'package:cab_booking_user/providers/location_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,7 +7,7 @@ class CarOptionsList extends ConsumerWidget {
   final String originCity;
   final String destinationCity;
   final int? selectedCarIndex;
-  final void Function(int) onCarSelected;
+  final void Function(Map<String, dynamic>) onCarSelected;
   final List<String> Function(String, String) normalizeCities;
 
   const CarOptionsList({
@@ -56,7 +56,17 @@ class CarOptionsList extends ConsumerWidget {
                     0,
                 imagePath: carOptions[i]['image']!,
                 isSelected: selectedCarIndex == i,
-                onTap: () => onCarSelected(i),
+                onTap: () {
+                  final car = carOptions[i];
+                  final price =
+                      int.tryParse(prices[car['key']]?.toString() ?? '0') ?? 0;
+                  onCarSelected({
+                    'name': car['name']!,
+                    'price': price,
+                    'image': car['image']!,
+                    'index': i,
+                  });
+                },
               ),
           ],
         );

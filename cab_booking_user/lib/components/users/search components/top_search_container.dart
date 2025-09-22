@@ -11,7 +11,8 @@ class TopSearchContainer extends StatelessWidget {
   final FocusNode originFocus;
   final FocusNode destinationFocus;
   final ValueChanged<String>? onOriginChanged;
-  final ValueChanged<String>? onDestinationChanged; // ✅ new
+  final ValueChanged<String>? onDestinationChanged;
+  final ValueChanged<DateTime>? onDateTimeChanged;
 
   const TopSearchContainer({
     super.key,
@@ -20,7 +21,8 @@ class TopSearchContainer extends StatelessWidget {
     required this.originFocus,
     required this.destinationFocus,
     this.onOriginChanged,
-    this.onDestinationChanged, // ✅ new
+    this.onDestinationChanged,
+    this.onDateTimeChanged,
   });
 
   @override
@@ -36,7 +38,10 @@ class TopSearchContainer extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Align(alignment: Alignment.topRight, child: NowButton()),
+          Align(
+            alignment: Alignment.topRight,
+            child: NowButton(onDateTimeChanged: onDateTimeChanged),
+          ),
           const SizedBox(height: 15),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -59,7 +64,7 @@ class TopSearchContainer extends StatelessWidget {
                       controller: destinationController,
                       hintText: 'Enter destination',
                       focusNode: destinationFocus,
-                      onChanged: onDestinationChanged, // ✅ now dynamic
+                      onChanged: onDestinationChanged,
                     ),
                   ],
                 ),
