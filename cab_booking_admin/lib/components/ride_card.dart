@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:cab_booking_admin/widgets/approval_buttons.dart';
 
 class RideCard extends StatelessWidget {
   final Map<String, dynamic> rideData;
@@ -14,6 +15,7 @@ class RideCard extends StatelessWidget {
     final dateTime = (rideData['dateTime'] as Timestamp).toDate();
     final formattedDate = DateFormat('dd MMM, yyyy').format(dateTime);
     final formattedTime = DateFormat('hh:mm a').format(dateTime);
+    final status = rideData['status'] as String? ?? '';
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16.0),
@@ -80,6 +82,12 @@ class RideCard extends StatelessWidget {
               "User ID",
               rideData['userId'] ?? 'N/A',
             ),
+            const SizedBox(height: 10),
+            if (status == 'success')
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [ApprovalButtons(onApprove: () {}, onReject: () {})],
+              ),
           ],
         ),
       ),
