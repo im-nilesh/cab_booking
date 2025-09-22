@@ -1,12 +1,14 @@
-import 'package:cab_booking_user/utils/constants.dart';
+import 'package:cab_booking_user/Widgets/car/car_info.dart';
+import 'package:cab_booking_user/Widgets/common/details_row.dart';
+import 'package:cab_booking_user/providers/booking_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:cab_booking_user/Widgets/button/primary_button.dart';
 import 'package:cab_booking_user/Widgets/button/success_button.dart';
 import 'package:cab_booking_user/Widgets/button/failure_button.dart';
 
-class BookingDetailsDialog extends StatefulWidget {
+class BookingDetailsDialog extends ConsumerStatefulWidget {
   final String origin;
   final String destination;
   final DateTime dateTime;
@@ -21,19 +23,17 @@ class BookingDetailsDialog extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<BookingDetailsDialog> createState() => _BookingDetailsDialogState();
+  ConsumerState<BookingDetailsDialog> createState() =>
+      _BookingDetailsDialogState();
 }
 
-class _BookingDetailsDialogState extends State<BookingDetailsDialog> {
+class _BookingDetailsDialogState extends ConsumerState<BookingDetailsDialog> {
   bool _showStatusButtons = false;
 
   @override
   Widget build(BuildContext context) {
     final formattedDate = DateFormat('dd MMM, yyyy').format(widget.dateTime);
     final formattedTime = DateFormat('hh:mm a').format(widget.dateTime);
-    final carName = widget.carDetails['name'];
-    final carPrice = widget.carDetails['price'];
-    final carImage = widget.carDetails['image'];
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -50,37 +50,35 @@ class _BookingDetailsDialogState extends State<BookingDetailsDialog> {
         children: [
           Text(
             'Confirm Your Ride',
-            style: GoogleFonts.outfit(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-            ),
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 20),
-          _buildDetailRow(Icons.calendar_today_outlined, 'Date', formattedDate),
-          _buildDetailRow(Icons.access_time_outlined, 'Time', formattedTime),
-          _buildDetailRow(Icons.trip_origin_outlined, 'From', widget.origin),
-          _buildDetailRow(Icons.location_on_outlined, 'To', widget.destination),
+          DetailRow(
+            icon: Icons.calendar_today_outlined,
+            label: 'Date',
+            value: formattedDate,
+          ),
+          DetailRow(
+            icon: Icons.access_time_outlined,
+            label: 'Time',
+            value: formattedTime,
+          ),
+          DetailRow(
+            icon: Icons.trip_origin_outlined,
+            label: 'From',
+            value: widget.origin,
+          ),
+          DetailRow(
+            icon: Icons.location_on_outlined,
+            label: 'To',
+            value: widget.destination,
+          ),
           const Divider(height: 30, thickness: 1),
-          Row(
-            children: [
-              Image.asset(carImage, height: 40, width: 80, fit: BoxFit.contain),
-              const SizedBox(width: 16),
-              Text(
-                carName,
-                style: GoogleFonts.outfit(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const Spacer(),
-              Text(
-                '₹ $carPrice',
-                style: GoogleFonts.outfit(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
+          CarInfoRow(
+            carName: widget.carDetails['name'],
+            carPrice: widget.carDetails['price'],
+            advancePrice: widget.carDetails['advancePrice'] ?? 0,
+            carImage: widget.carDetails['image'],
           ),
           const SizedBox(height: 30),
           if (!_showStatusButtons)
@@ -105,8 +103,16 @@ class _BookingDetailsDialogState extends State<BookingDetailsDialog> {
                   height: 50,
                   child: SuccessButton(
                     text: 'Success',
-                    onPressed: () {
-                      // Handle success logic
+                    onPressed: () async {
+                      await ref
+                          .read(bookingProvider)
+                          .createRide(
+                            origin: widget.origin,
+                            destination: widget.destination,
+                            dateTime: widget.dateTime,
+                            carDetails: widget.carDetails,
+                            status: 'success',
+                          );
                       Navigator.pop(context);
                     },
                   ),
@@ -116,8 +122,16 @@ class _BookingDetailsDialogState extends State<BookingDetailsDialog> {
                   height: 50,
                   child: FailureButton(
                     text: 'Failure',
-                    onPressed: () {
-                      // Handle failure logic
+                    onPressed: () async {
+                      await ref
+                          .read(bookingProvider)
+                          .createRide(
+                            origin: widget.origin,
+                            destination: widget.destination,
+                            dateTime: widget.dateTime,
+                            carDetails: widget.carDetails,
+                            status: 'failure',
+                          );
                       Navigator.pop(context);
                     },
                   ),
@@ -125,36 +139,6 @@ class _BookingDetailsDialogState extends State<BookingDetailsDialog> {
               ],
             ),
           const SizedBox(height: 10),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDetailRow(IconData icon, String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, size: 20, color: Colors.grey.shade600),
-          const SizedBox(width: 15),
-          Text(
-            '$label: ',
-            style: GoogleFonts.outfit(
-              fontWeight: FontWeight.w500,
-              fontSize: 15,
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: GoogleFonts.outfit(
-                fontSize: 15,
-                color: Colors.grey.shade800,
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
         ],
       ),
     );

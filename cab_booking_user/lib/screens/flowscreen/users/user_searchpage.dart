@@ -1,6 +1,4 @@
-// lib/pages/search_page.dart (or wherever your original file is)
-
-import 'package:cab_booking_user/components/users/search%20components/booking_details.dart';
+import 'package:cab_booking_user/components/users/search%20components/booking_details_card.dart';
 import 'package:cab_booking_user/components/users/search%20components/search_body_content.dart';
 import 'package:cab_booking_user/components/users/search%20components/top_search_container.dart';
 
