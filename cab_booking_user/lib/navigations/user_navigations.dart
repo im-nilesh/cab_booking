@@ -17,17 +17,14 @@ class UserNavigation extends StatefulWidget {
 class _UserNavigationState extends State<UserNavigation> {
   int _selectedIndex = 0;
 
-  // ✅ Make the list non-static, final, and remove const for SearchPage
   late final List<Widget> _widgetOptions = <Widget>[
     const HomePage(),
-    SearchPage(), // ConsumerStatefulWidget → cannot be const
+    SearchPage(), // <-- must NOT be const
     const ProfilePage(),
   ];
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    setState(() => _selectedIndex = index);
   }
 
   @override
@@ -74,8 +71,7 @@ class _UserNavigationState extends State<UserNavigation> {
               index: 2,
               selectedIndex: _selectedIndex,
               inactiveIconPath: 'assets/images/svg/profile-circle.svg',
-              activeIconPath:
-                  'assets/images/svg/profile-circle.svg', // Same icon for active state
+              activeIconPath: 'assets/images/svg/profile-circle.svg',
               label: 'Profile',
               onTap: () => _onItemTapped(2),
               selectedColor: greencolor,

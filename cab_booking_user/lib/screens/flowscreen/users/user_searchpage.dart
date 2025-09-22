@@ -1,10 +1,10 @@
+// lib/screens/flowscreen/users/user_searchpage.dart
+
 import 'package:cab_booking_user/Widgets/car/car_options.dart';
 import 'package:cab_booking_user/Widgets/title/location_suggestion_title_widget.dart';
 import 'package:cab_booking_user/components/users/search%20components/no_rides_found.dart';
 import 'package:cab_booking_user/components/users/search%20components/top_search_container.dart';
-import 'package:cab_booking_user/providers/destination_provider.dart';
-import 'package:cab_booking_user/providers/origin_query_provider.dart';
-import 'package:cab_booking_user/providers/price_provider.dart';
+import 'package:cab_booking_user/providers/location_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -41,23 +41,75 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     super.dispose();
   }
 
+  List<String> normalizeCities(String c1, String c2) {
+    final cities = [c1.trim(), c2.trim()]
+      ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+    return cities;
+  }
+
+  Widget _buildSuggestions({
+    required AsyncValue<List<Map<String, dynamic>>> suggestionsAsync,
+    required void Function(String city, String area) onSelect,
+  }) {
+    return suggestionsAsync.when(
+      data: (suggestions) {
+        if (suggestions.isEmpty) return const NoRidesFound();
+        return Column(
+          children:
+              suggestions.expand((item) {
+                final city = item['city'] as String? ?? '';
+                final areas = (item['areas'] as List).cast<String>();
+                return areas.map(
+                  (area) => LocationSuggestionTile(
+                    city: city,
+                    address: area,
+                    onTap: () => onSelect(city, area),
+                  ),
+                );
+              }).toList(),
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) {
+        debugPrint('Suggestions error: $e');
+        return const Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Text('Error loading suggestions'),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final originSuggestionsAsync = ref.watch(originSuggestionsProvider);
-    final destinationSuggestionsAsync = ref.watch(
-      destinationSuggestionsProvider,
-    );
-
     final showOriginSuggestions =
         _originFocus.hasFocus && _originController.text.isNotEmpty;
     final showDestinationSuggestions =
         _destinationFocus.hasFocus && _destinationController.text.isNotEmpty;
+
+    final originSuggestionsAsync = ref.watch(
+      locationSearchProvider(_originController.text),
+    );
+    final destinationSuggestionsAsync = ref.watch(
+      locationSearchProvider(_destinationController.text),
+    );
 
     final showCarOptions =
         selectedOriginCity != null &&
         selectedDestinationCity != null &&
         !showOriginSuggestions &&
         !showDestinationSuggestions;
+
+    final carOptions = [
+      {'name': 'sedan', 'key': 'sedan', 'image': 'assets/images/sedan.png'},
+      {
+        'name': 'Hatchback',
+        'key': 'hatchback',
+        'image': 'assets/images/hatchback.png',
+      },
+      {'name': 'SUV', 'key': 'suvErtiga', 'image': 'assets/images/suv.png'},
+      {'name': 'Luxury', 'key': 'xylo', 'image': 'assets/images/luxury.png'},
+    ];
 
     return Scaffold(
       body: Column(
@@ -68,7 +120,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             originFocus: _originFocus,
             destinationFocus: _destinationFocus,
             onOriginChanged: (value) {
-              ref.read(originQueryProvider.notifier).state = value;
               setState(() {
                 selectedOriginCity = null;
                 selectedDestinationCity = null;
@@ -76,7 +127,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               });
             },
             onDestinationChanged: (value) {
-              ref.read(destinationQueryProvider.notifier).state = value;
+              setState(() {}); // triggers rebuild and provider fetch
             },
           ),
           Expanded(
@@ -89,158 +140,75 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (showOriginSuggestions)
-                    originSuggestionsAsync.when(
-                      data: (suggestions) {
-                        if (suggestions.isEmpty) return const NoRidesFound();
-                        return Column(
-                          children:
-                              suggestions.expand((item) {
-                                final city = item['cityOne'] as String? ?? '';
-                                final areas =
-                                    (item['areas'] as List).cast<String>();
-                                return areas.map(
-                                  (area) => LocationSuggestionTile(
-                                    city: city,
-                                    address: area,
-                                    onTap: () {
-                                      _originController.text = "$area, $city";
-                                      selectedOriginCity = city;
-                                      _originFocus.unfocus();
-                                      setState(() {});
-                                    },
-                                  ),
-                                );
-                              }).toList(),
-                        );
+                    _buildSuggestions(
+                      suggestionsAsync: originSuggestionsAsync,
+                      onSelect: (city, area) {
+                        _originController.text = "$area, $city";
+                        selectedOriginCity = city.trim();
+                        _originFocus.unfocus();
+                        setState(() {});
                       },
-                      loading:
-                          () =>
-                              const Center(child: CircularProgressIndicator()),
-                      error:
-                          (e, _) => const Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text('Error loading origin cities'),
-                          ),
                     ),
                   if (showDestinationSuggestions)
-                    destinationSuggestionsAsync.when(
-                      data: (suggestions) {
-                        if (suggestions.isEmpty) return const NoRidesFound();
-                        return Column(
-                          children:
-                              suggestions.expand((item) {
-                                final city = item['cityTwo'] as String? ?? '';
-                                final areas =
-                                    (item['areas'] as List).cast<String>();
-                                return areas.map(
-                                  (area) => LocationSuggestionTile(
-                                    city: city,
-                                    address: area,
-                                    onTap: () {
-                                      _destinationController.text =
-                                          "$area, $city";
-                                      selectedDestinationCity = city;
-                                      _destinationFocus.unfocus();
-                                      setState(() {});
-                                    },
-                                  ),
-                                );
-                              }).toList(),
-                        );
+                    _buildSuggestions(
+                      suggestionsAsync: destinationSuggestionsAsync,
+                      onSelect: (city, area) {
+                        _destinationController.text = "$area, $city";
+                        selectedDestinationCity = city.trim();
+                        _destinationFocus.unfocus();
+                        setState(() {});
                       },
-                      loading:
-                          () =>
-                              const Center(child: CircularProgressIndicator()),
-                      error:
-                          (e, _) => const Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text('Error loading destination cities'),
-                          ),
                     ),
                   if (showCarOptions)
                     Consumer(
-                      builder: (context, ref, child) {
-                        final priceValue = ref.watch(
-                          priceProvider(
-                            '$selectedOriginCity-$selectedDestinationCity',
-                          ),
+                      builder: (context, ref, _) {
+                        if (selectedOriginCity == null ||
+                            selectedDestinationCity == null) {
+                          return const SizedBox.shrink();
+                        }
+
+                        // Create a string key from the normalized cities
+                        final pairKey = normalizeCities(
+                          selectedOriginCity!,
+                          selectedDestinationCity!,
+                        ).join('-');
+
+                        final priceAsync = ref.watch(
+                          routePriceProvider(
+                            pairKey,
+                          ), // Pass string key instead of List
                         );
 
-                        return priceValue.when(
+                        return priceAsync.when(
                           data: (prices) {
                             if (prices.isEmpty) {
                               return const Center(
-                                child: Padding(
-                                  padding: EdgeInsets.all(20.0),
-                                  child: Text(
-                                    'No pricing available for this route.',
-                                  ),
+                                child: Text(
+                                  'No pricing available for this route.',
                                 ),
                               );
                             }
 
                             return Column(
                               children: [
-                                CarOptionCard(
-                                  carName: 'Sedan',
-                                  price:
-                                      int.tryParse(
-                                        prices['sedan']?.toString() ?? '0',
-                                      ) ??
-                                      0,
-                                  imagePath: 'assets/images/sedan.png',
-                                  isSelected: selectedCarIndex == 0,
-                                  onTap: () {
-                                    setState(() {
-                                      selectedCarIndex = 0;
-                                    });
-                                  },
-                                ),
-                                CarOptionCard(
-                                  carName: 'Hatchback',
-                                  price:
-                                      int.tryParse(
-                                        prices['hatchback']?.toString() ?? '0',
-                                      ) ??
-                                      0,
-                                  imagePath: 'assets/images/hatchback.png',
-                                  isSelected: selectedCarIndex == 1,
-                                  onTap: () {
-                                    setState(() {
-                                      selectedCarIndex = 1;
-                                    });
-                                  },
-                                ),
-                                CarOptionCard(
-                                  carName: 'SUV',
-                                  price:
-                                      int.tryParse(
-                                        prices['suvErtiga']?.toString() ?? '0',
-                                      ) ??
-                                      0,
-                                  imagePath: 'assets/images/suv.png',
-                                  isSelected: selectedCarIndex == 2,
-                                  onTap: () {
-                                    setState(() {
-                                      selectedCarIndex = 2;
-                                    });
-                                  },
-                                ),
-                                CarOptionCard(
-                                  carName: 'Luxury',
-                                  price:
-                                      int.tryParse(
-                                        prices['xylo']?.toString() ?? '0',
-                                      ) ??
-                                      0,
-                                  imagePath: 'assets/images/luxury.png',
-                                  isSelected: selectedCarIndex == 3,
-                                  onTap: () {
-                                    setState(() {
-                                      selectedCarIndex = 3;
-                                    });
-                                  },
-                                ),
+                                for (int i = 0; i < carOptions.length; i++)
+                                  CarOptionCard(
+                                    carName: carOptions[i]['name']!,
+                                    price:
+                                        int.tryParse(
+                                          prices[carOptions[i]['key']]
+                                                  ?.toString() ??
+                                              '0',
+                                        ) ??
+                                        0,
+                                    imagePath: carOptions[i]['image']!,
+                                    isSelected: selectedCarIndex == i,
+                                    onTap: () {
+                                      setState(() {
+                                        selectedCarIndex = i;
+                                      });
+                                    },
+                                  ),
                               ],
                             );
                           },
@@ -249,12 +217,13 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                                 child: CircularProgressIndicator(),
                               ),
                           error:
-                              (error, stack) => const Center(
+                              (e, _) => const Center(
                                 child: Text('Error loading prices.'),
                               ),
                         );
                       },
                     ),
+
                   if (!showOriginSuggestions &&
                       !showDestinationSuggestions &&
                       !showCarOptions)

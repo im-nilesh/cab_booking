@@ -1,3 +1,10 @@
+22-09-25
+
+1. Fix search API
+2. Integrate razorpay payment gateway and book rides
+3. show booked rides on admin
+4. Appove rides on admin
+
 19-09-25
 
 1. User- create find ride UI. - done
