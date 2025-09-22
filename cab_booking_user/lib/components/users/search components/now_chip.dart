@@ -1,23 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:cab_booking_user/utils/constants.dart';
+import 'package:intl/intl.dart'; // for formatting date/time
 
-class NowButton extends StatelessWidget {
+class NowButton extends StatefulWidget {
   const NowButton({super.key});
+
+  @override
+  State<NowButton> createState() => _NowButtonState();
+}
+
+class _NowButtonState extends State<NowButton> {
+  DateTime? selectedDateTime;
 
   Future<void> _pickDateTime(BuildContext context) async {
     // Step 1: pick date
     final DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: selectedDateTime ?? DateTime.now(),
       firstDate: DateTime.now(),
       lastDate: DateTime(2100),
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
-              primary: greencolor, // header + confirm btn
-              onPrimary: whiteColor, // text on header
-              onSurface: Colors.black, // body text
+              primary: greencolor,
+              onPrimary: whiteColor,
+              onSurface: Colors.black,
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(foregroundColor: greencolor),
@@ -33,7 +41,13 @@ class NowButton extends StatelessWidget {
     // Step 2: pick time
     final TimeOfDay? pickedTime = await showTimePicker(
       context: context,
-      initialTime: TimeOfDay.now(),
+      initialTime:
+          selectedDateTime != null
+              ? TimeOfDay(
+                hour: selectedDateTime!.hour,
+                minute: selectedDateTime!.minute,
+              )
+              : TimeOfDay.now(),
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
@@ -51,7 +65,7 @@ class NowButton extends StatelessWidget {
     if (pickedTime == null) return;
 
     // Step 3: combine into DateTime
-    final selectedDateTime = DateTime(
+    final dateTime = DateTime(
       pickedDate.year,
       pickedDate.month,
       pickedDate.day,
@@ -59,12 +73,21 @@ class NowButton extends StatelessWidget {
       pickedTime.minute,
     );
 
+    setState(() {
+      selectedDateTime = dateTime;
+    });
+
     debugPrint("Selected DateTime: $selectedDateTime");
     // TODO: pass to state/provider if needed
   }
 
   @override
   Widget build(BuildContext context) {
+    final displayText =
+        selectedDateTime != null
+            ? DateFormat('dd MMM, hh:mm a').format(selectedDateTime!)
+            : 'Now';
+
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.black.withOpacity(0.15),
@@ -73,12 +96,15 @@ class NowButton extends StatelessWidget {
         elevation: 0,
       ),
       onPressed: () => _pickDateTime(context),
-      child: const Row(
+      child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('Now', style: TextStyle(color: whiteColor, fontSize: 14)),
-          SizedBox(width: 4),
-          Icon(Icons.keyboard_arrow_down, color: whiteColor, size: 20),
+          Text(
+            displayText,
+            style: const TextStyle(color: whiteColor, fontSize: 14),
+          ),
+          const SizedBox(width: 4),
+          const Icon(Icons.keyboard_arrow_down, color: whiteColor, size: 20),
         ],
       ),
     );
