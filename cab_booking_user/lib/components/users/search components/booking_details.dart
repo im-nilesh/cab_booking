@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:cab_booking_user/Widgets/button/primary_button.dart';
+import 'package:cab_booking_user/Widgets/button/success_button.dart';
+import 'package:cab_booking_user/Widgets/button/failure_button.dart';
 
-class BookingDetailsDialog extends StatelessWidget {
+class BookingDetailsDialog extends StatefulWidget {
   final String origin;
   final String destination;
   final DateTime dateTime;
@@ -19,12 +21,19 @@ class BookingDetailsDialog extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<BookingDetailsDialog> createState() => _BookingDetailsDialogState();
+}
+
+class _BookingDetailsDialogState extends State<BookingDetailsDialog> {
+  bool _showStatusButtons = false;
+
+  @override
   Widget build(BuildContext context) {
-    final formattedDate = DateFormat('dd MMM, yyyy').format(dateTime);
-    final formattedTime = DateFormat('hh:mm a').format(dateTime);
-    final carName = carDetails['name'];
-    final carPrice = carDetails['price'];
-    final carImage = carDetails['image'];
+    final formattedDate = DateFormat('dd MMM, yyyy').format(widget.dateTime);
+    final formattedTime = DateFormat('hh:mm a').format(widget.dateTime);
+    final carName = widget.carDetails['name'];
+    final carPrice = widget.carDetails['price'];
+    final carImage = widget.carDetails['image'];
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -49,8 +58,8 @@ class BookingDetailsDialog extends StatelessWidget {
           const SizedBox(height: 20),
           _buildDetailRow(Icons.calendar_today_outlined, 'Date', formattedDate),
           _buildDetailRow(Icons.access_time_outlined, 'Time', formattedTime),
-          _buildDetailRow(Icons.trip_origin_outlined, 'From', origin),
-          _buildDetailRow(Icons.location_on_outlined, 'To', destination),
+          _buildDetailRow(Icons.trip_origin_outlined, 'From', widget.origin),
+          _buildDetailRow(Icons.location_on_outlined, 'To', widget.destination),
           const Divider(height: 30, thickness: 1),
           Row(
             children: [
@@ -74,17 +83,47 @@ class BookingDetailsDialog extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 30),
-          SizedBox(
-            width: double.infinity,
-            height: 50,
-            child: PrimaryButton(
-              text: 'Proceed to Book',
-              onPressed: () {
-                // TODO: Implement booking and payment logic here
-                Navigator.pop(context); // Close the dialog
-              },
+          if (!_showStatusButtons)
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: PrimaryButton(
+                text: 'Proceed to Book',
+                onPressed: () {
+                  setState(() {
+                    _showStatusButtons = true;
+                  });
+                },
+              ),
             ),
-          ),
+          if (_showStatusButtons)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.4,
+                  height: 50,
+                  child: SuccessButton(
+                    text: 'Success',
+                    onPressed: () {
+                      // Handle success logic
+                      Navigator.pop(context);
+                    },
+                  ),
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.4,
+                  height: 50,
+                  child: FailureButton(
+                    text: 'Failure',
+                    onPressed: () {
+                      // Handle failure logic
+                      Navigator.pop(context);
+                    },
+                  ),
+                ),
+              ],
+            ),
           const SizedBox(height: 10),
         ],
       ),
