@@ -5,6 +5,7 @@ import 'package:cab_booking_user/screens/auth/driver/driver_registration_complet
 import 'package:cab_booking_user/screens/auth/driver/driver_profile_created_screen.dart';
 import 'package:cab_booking_user/screens/auth/otp_screen.dart';
 import 'package:cab_booking_user/screens/user_choice.dart';
+import 'package:cab_booking_user/screens/welcome_screen.dart'; // Import WelcomeScreen
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -223,9 +224,7 @@ class AuthGate extends ConsumerWidget {
     return authState.when(
       data: (user) {
         if (user == null) {
-          return const Scaffold(
-            body: Center(child: Text('Login Screen Placeholder')),
-          );
+          return WelcomeScreen(); // Navigate to WelcomeScreen if not logged in
         }
 
         final roleAsync = ref.watch(userRoleProvider);

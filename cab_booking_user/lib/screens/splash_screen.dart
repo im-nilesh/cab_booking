@@ -1,7 +1,10 @@
+// lib/screens/splash_screen.dart
+
 import 'dart:async';
 
+import 'package:cab_booking_user/providers/auth_provider.dart'; // Import AuthGate
 import 'package:cab_booking_user/screens/slider_screen.dart';
-import 'package:cab_booking_user/screens/welcome_screen.dart';
+// import 'package:cab_booking_user/screens/welcome_screen.dart'; // No longer directly used here
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -30,10 +33,10 @@ class _SplashScreenState extends State<SplashScreen> {
 
     if (mounted) {
       if (isFirstTime) {
-        // If the user has already seen the onboarding, go to WelcomeScreen
+        // If the user has already seen the onboarding, go to AuthGate for auto-login check
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => WelcomeScreen()),
+          MaterialPageRoute(builder: (context) => AuthGate()),
         );
       } else {
         // If it's the first time, show SliderScreen
