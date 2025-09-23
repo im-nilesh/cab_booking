@@ -22,7 +22,8 @@ class BookingService {
       'dateTime': dateTime,
       'carDetails': carDetails,
       'prices': carDetails['prices'] ?? {},
-      'status': status,
+      'payment_status': status,
+      'ride_status': 'created',
     });
   }
 }

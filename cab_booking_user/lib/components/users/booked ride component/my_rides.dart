@@ -26,52 +26,32 @@ class MyRidesScreen extends StatelessWidget {
           FirebaseFirestore.instance
               .collection('rides')
               .where('userId', isEqualTo: currentUser.uid)
-              .where('status', isEqualTo: 'success')
+              .where('payment_status', isEqualTo: 'success') // fixed
               .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Align(
-            alignment: Alignment.topLeft,
-            child: Padding(
-              padding: EdgeInsets.only(top: 0),
-              child: CircularProgressIndicator(),
-            ),
-          );
+          return const Center(child: CircularProgressIndicator());
         }
         if (snapshot.hasError) {
-          return Align(
-            alignment: Alignment.topLeft,
-            child: Padding(
-              padding: const EdgeInsets.only(top: 0),
-              child: Text('Error: ${snapshot.error}'),
-            ),
-          );
+          return Text('Error: ${snapshot.error}');
         }
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return const Align(
-            alignment: Alignment.topLeft,
-            child: Padding(
-              padding: EdgeInsets.only(top: 0),
-              child: Text('No successful rides booked yet.'),
-            ),
-          );
+          return const Text('No successful rides booked yet.');
         }
 
         final rides = snapshot.data!.docs;
 
-        // Sort the rides by dateTime in descending order (latest to oldest)
+        // Sort by dateTime (latest first)
         rides.sort((a, b) {
-          final aData = a.data() as Map<String, dynamic>;
-          final bData = b.data() as Map<String, dynamic>;
-          final aDateTime = (aData['dateTime'] as Timestamp).toDate();
-          final bDateTime = (bData['dateTime'] as Timestamp).toDate();
+          final aDateTime = (a['dateTime'] as Timestamp).toDate();
+          final bDateTime = (b['dateTime'] as Timestamp).toDate();
           return bDateTime.compareTo(aDateTime);
         });
 
         return ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          padding: EdgeInsets.zero, // ✅ removes default ListView padding
+          padding: EdgeInsets.zero,
           itemCount: rides.length,
           itemBuilder: (context, index) {
             final ride = rides[index].data() as Map<String, dynamic>;
