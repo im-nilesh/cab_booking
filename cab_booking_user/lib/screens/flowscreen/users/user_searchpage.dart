@@ -1,4 +1,4 @@
-import 'package:cab_booking_user/components/users/search%20components/booking_details_card.dart';
+import 'package:cab_booking_user/components/users/booked%20ride%20component/booking_details_card.dart';
 import 'package:cab_booking_user/components/users/search%20components/search_body_content.dart';
 import 'package:cab_booking_user/components/users/search%20components/top_search_container.dart';
 
