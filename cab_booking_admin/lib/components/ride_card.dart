@@ -1,3 +1,4 @@
+import 'package:cab_booking_admin/components/driver_list_popup.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -86,7 +87,19 @@ class RideCard extends StatelessWidget {
             if (status == 'success')
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
-                children: [ApprovalButtons(onApprove: () {}, onReject: () {})],
+                children: [
+                  ApprovalButtons(
+                    onApprove: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return DriverListPopup();
+                        },
+                      );
+                    },
+                    onReject: () {},
+                  ),
+                ],
               ),
           ],
         ),
