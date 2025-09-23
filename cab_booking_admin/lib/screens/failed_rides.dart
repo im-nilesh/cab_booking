@@ -26,7 +26,10 @@ class FailedRidesScreen extends ConsumerWidget {
             itemCount: rides.length,
             itemBuilder: (context, index) {
               final ride = rides[index];
-              return RideCard(rideData: ride.data() as Map<String, dynamic>);
+              return RideCard(
+                rideData: ride.data() as Map<String, dynamic>,
+                rideId: ride.id,
+              );
             },
           );
         },

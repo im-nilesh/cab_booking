@@ -1,9 +1,12 @@
 import 'package:cab_booking_admin/widgets/driver%20widgets/driver_confirmation_dialog.dart';
 import 'package:cab_booking_admin/widgets/driver%20widgets/driver_list_view.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DriverListPopup extends StatelessWidget {
+  final String rideId;
+
+  const DriverListPopup({super.key, required this.rideId});
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -38,8 +41,8 @@ class DriverListPopup extends StatelessWidget {
             width: double.maxFinite,
             height: 350,
             child: DriverListView(
-              onDriverTap: (driverName) {
-                _showConfirmationDialog(context, driverName);
+              onDriverTap: (driverUid, driverName) {
+                _showConfirmationDialog(context, driverUid, driverName);
               },
             ),
           ),
@@ -63,11 +66,19 @@ class DriverListPopup extends StatelessWidget {
     );
   }
 
-  void _showConfirmationDialog(BuildContext context, String driverName) {
+  void _showConfirmationDialog(
+    BuildContext context,
+    String driverUid,
+    String driverName,
+  ) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return DriverConfirmationDialog(driverName: driverName);
+        return DriverConfirmationDialog(
+          rideId: rideId,
+          driverUid: driverUid,
+          driverName: driverName,
+        );
       },
     );
   }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DriverListView extends StatelessWidget {
-  final void Function(String driverName) onDriverTap;
+  final void Function(String driverUid, String driverName) onDriverTap;
 
   const DriverListView({super.key, required this.onDriverTap});
 
@@ -32,7 +32,9 @@ class DriverListView extends StatelessWidget {
           shrinkWrap: true,
           itemCount: drivers.length,
           itemBuilder: (context, index) {
-            final driver = drivers[index].data() as Map<String, dynamic>;
+            final doc = drivers[index];
+            final driver = doc.data() as Map<String, dynamic>;
+            final driverUid = doc.id;
             final driverName =
                 '${driver['firstName'] ?? ''} ${driver['lastName'] ?? ''}'
                     .trim();
@@ -59,7 +61,7 @@ class DriverListView extends StatelessWidget {
                   style: TextStyle(fontWeight: FontWeight.w600),
                 ),
                 subtitle: Text(phoneNumber),
-                onTap: () => onDriverTap(driverName),
+                onTap: () => onDriverTap(driverUid, driverName),
               ),
             );
           },

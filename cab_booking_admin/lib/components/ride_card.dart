@@ -7,8 +7,10 @@ import "package:cab_booking_admin/widgets/Buttons/ride_approval_buttons.dart";
 
 class RideCard extends StatelessWidget {
   final Map<String, dynamic> rideData;
+  final String rideId;
 
-  const RideCard({Key? key, required this.rideData}) : super(key: key);
+  const RideCard({Key? key, required this.rideData, required this.rideId})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -93,11 +95,16 @@ class RideCard extends StatelessWidget {
                       showDialog(
                         context: context,
                         builder: (BuildContext context) {
-                          return DriverListPopup();
+                          return DriverListPopup(rideId: rideId);
                         },
                       );
                     },
-                    onReject: () {},
+                    onReject: () async {
+                      await FirebaseFirestore.instance
+                          .collection('rides')
+                          .doc(rideId)
+                          .update({'ride_status': 'rejected'});
+                    },
                   ),
                 ],
               ),
