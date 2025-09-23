@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import "package:cab_booking_admin/widgets/ride_approval_buttons.dart";
+import "package:cab_booking_admin/widgets/Buttons/ride_approval_buttons.dart";
 
 class RideCard extends StatelessWidget {
   final Map<String, dynamic> rideData;
