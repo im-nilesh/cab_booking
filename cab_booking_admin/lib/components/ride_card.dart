@@ -15,7 +15,7 @@ class RideCard extends StatelessWidget {
     final dateTime = (rideData['dateTime'] as Timestamp).toDate();
     final formattedDate = DateFormat('dd MMM, yyyy').format(dateTime);
     final formattedTime = DateFormat('hh:mm a').format(dateTime);
-    final status = rideData['status'] as String? ?? '';
+    final status = rideData['payment_status'] as String? ?? '';
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16.0),
