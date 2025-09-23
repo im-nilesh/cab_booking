@@ -1,8 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cab_booking_admin/provider/ride_status_provider.dart';
 import 'package:flutter/material.dart';
-import 'dart:math';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cab_booking_admin/provider/driver_provider.dart';
 
-class DriverConfirmationDialog extends StatelessWidget {
+class DriverConfirmationDialog extends ConsumerWidget {
   final String rideId;
   final String driverUid;
   final String driverName;
@@ -14,14 +15,8 @@ class DriverConfirmationDialog extends StatelessWidget {
     required this.driverName,
   });
 
-  /// Generate a random 4-digit OTP
-  String generateOtp() {
-    final random = Random();
-    return (1000 + random.nextInt(9000)).toString();
-  }
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       title: const Text("Confirm Assignment"),
@@ -29,9 +24,7 @@ class DriverConfirmationDialog extends StatelessWidget {
       actions: <Widget>[
         TextButton(
           child: Text("No", style: TextStyle(color: Colors.grey[800])),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
+          onPressed: () => Navigator.of(context).pop(),
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
@@ -46,17 +39,20 @@ class DriverConfirmationDialog extends StatelessWidget {
           ),
           onPressed: () async {
             try {
-              final otp = generateOtp();
-
-              await FirebaseFirestore.instance.collection('driverRides').add({
-                'driverUid': driverUid,
-                'rideId': rideId,
-                'otp': otp,
-                'createdAt': FieldValue.serverTimestamp(),
-              });
+              await ref
+                  .read(driverAssignmentProvider)
+                  .assignDriver(
+                    rideId: rideId,
+                    driverUid: driverUid,
+                    driverName: driverName,
+                  );
 
               Navigator.of(context).pop(); // close confirmation
               Navigator.of(context).pop(); // close driver list
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Driver assigned successfully!")),
+              );
             } catch (e) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text("Error assigning driver: $e")),
