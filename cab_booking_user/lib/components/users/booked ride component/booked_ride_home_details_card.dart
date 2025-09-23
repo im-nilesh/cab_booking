@@ -1,3 +1,4 @@
+import 'package:cab_booking_user/components/users/otp/opt_display.dart';
 import 'package:flutter/material.dart';
 import 'package:cab_booking_user/utils/constants.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -15,6 +16,7 @@ class BookedRideDetailsCard extends StatelessWidget {
     final String formattedTime = DateFormat('HH:mm').format(rideDateTime);
     final String formattedDate = DateFormat('dd MMM').format(rideDateTime);
     final String rideStatus = rideData['ride_status'] ?? '';
+    final String otp = rideData['otp'] ?? '';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -47,6 +49,9 @@ class BookedRideDetailsCard extends StatelessWidget {
                     color: greencolor,
                   ),
                 ),
+                const Spacer(),
+                if (rideStatus == 'assigned' && otp.isNotEmpty)
+                  OtpDisplay(otp: otp),
               ],
             ),
           ),
@@ -150,6 +155,25 @@ class BookedRideDetailsCard extends StatelessWidget {
                             style: GoogleFonts.outfit(
                               fontSize: 14,
                               color: Colors.orange,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    if (rideStatus == 'assigned')
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.check_circle,
+                            color: Colors.green,
+                            size: 16,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Request accepted',
+                            style: GoogleFonts.outfit(
+                              fontSize: 14,
+                              color: Colors.green,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
