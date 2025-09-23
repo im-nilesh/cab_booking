@@ -14,7 +14,6 @@ class BookedRideDetailsCard extends StatelessWidget {
     final DateTime rideDateTime = rideData['dateTime'].toDate();
     final String formattedTime = DateFormat('HH:mm').format(rideDateTime);
     final String formattedDate = DateFormat('dd MMM').format(rideDateTime);
-    final String paymentStatus = rideData['payment_status'] ?? '';
     final String rideStatus = rideData['ride_status'] ?? '';
 
     return Container(
@@ -55,133 +54,109 @@ class BookedRideDetailsCard extends StatelessWidget {
           // Ride Details
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Column(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                // Date and Time Column
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Date + Time
+                    Text(
+                      formattedDate,
+                      style: GoogleFonts.outfit(
+                        fontSize: 14,
+                        color: Colors.black54,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      formattedTime,
+                      style: GoogleFonts.outfit(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+
+                // Locations Column
+                Row(
+                  children: [
+                    Column(
+                      children: [
+                        const Icon(
+                          Icons.circle_outlined,
+                          color: Colors.green,
+                          size: 12,
+                        ),
+                        SizedBox(
+                          height: 20,
+                          child: VerticalDivider(
+                            color: Colors.grey.shade400,
+                            thickness: 1,
+                          ),
+                        ),
+                        const Icon(Icons.circle, color: Colors.green, size: 12),
+                      ],
+                    ),
+                    const SizedBox(width: 8),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          formattedDate,
+                          rideData['origin'],
                           style: GoogleFonts.outfit(
-                            fontSize: 14,
-                            color: Colors.black54,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 10),
                         Text(
-                          formattedTime,
+                          rideData['destination'],
                           style: GoogleFonts.outfit(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
                           ),
-                        ),
-                      ],
-                    ),
-
-                    // Origin -> Destination
-                    Row(
-                      children: [
-                        Column(
-                          children: [
-                            const Icon(
-                              Icons.circle,
-                              color: Colors.green,
-                              size: 12,
-                            ),
-                            SizedBox(
-                              height: 20,
-                              child: VerticalDivider(
-                                color: Colors.grey.shade400,
-                                thickness: 2,
-                              ),
-                            ),
-                            const Icon(
-                              Icons.circle,
-                              color: Colors.green,
-                              size: 12,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(width: 8),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              rideData['origin'],
-                              style: GoogleFonts.outfit(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            Text(
-                              rideData['destination'],
-                              style: GoogleFonts.outfit(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
                         ),
                       ],
                     ),
                   ],
                 ),
 
-                const SizedBox(height: 12),
-
-                // Show car details if available
-                if (rideData['carDetails'] != null) ...[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Car: ${rideData['carDetails']['name'] ?? 'N/A'}",
-                        style: GoogleFonts.outfit(fontSize: 14),
+                // Seat and Status Column
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      'Seat reserved',
+                      style: GoogleFonts.outfit(
+                        fontSize: 14,
+                        color: Colors.black54,
                       ),
-                      Text(
-                        "Seats: ${rideData['carDetails']['seats'] ?? '-'}",
-                        style: GoogleFonts.outfit(fontSize: 14),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    "Price: ₹${rideData['carDetails']['prices']?['base'] ?? '-'}",
-                    style: GoogleFonts.outfit(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
                     ),
-                  ),
-                ],
-
-                const SizedBox(height: 12),
-
-                // ✅ Conditional Request Pending
-                if (paymentStatus == 'success' && rideStatus == 'complete')
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.hourglass_bottom,
-                        color: Colors.orange,
-                        size: 16,
+                    const SizedBox(height: 10),
+                    if (rideStatus == 'created')
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.hourglass_bottom,
+                            color: Colors.orange,
+                            size: 16,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Request pending',
+                            style: GoogleFonts.outfit(
+                              fontSize: 14,
+                              color: Colors.orange,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 6),
-                      Text(
-                        'Request pending',
-                        style: GoogleFonts.outfit(
-                          fontSize: 14,
-                          color: Colors.orange,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
+                  ],
+                ),
               ],
             ),
           ),
