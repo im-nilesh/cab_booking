@@ -116,11 +116,8 @@ final routePriceProvider = FutureProvider.family<Map<String, dynamic>, String>((
     if (normalizedCities[0] == citiesInDoc[0] &&
         normalizedCities[1] == citiesInDoc[1]) {
       final prices = Map<String, dynamic>.from(data['prices'] ?? {});
-      final advancePrice = data['advancePrice'] ?? 0;
-      debugPrint(
-        'Matched doc ${doc.id}, prices: $prices, advancePrice: $advancePrice',
-      );
-      return {'prices': prices, 'advancePrice': advancePrice};
+      debugPrint('Matched doc ${doc.id}, prices: $prices');
+      return prices; // ✅ only return prices
     }
   }
 

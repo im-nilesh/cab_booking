@@ -21,8 +21,7 @@ class BookingService {
       'destination': destination,
       'dateTime': dateTime,
       'carDetails': carDetails,
-      'advancePrice':
-          num.tryParse(carDetails['advancePrice']?.toString() ?? '0') ?? 0,
+      'prices': carDetails['prices'] ?? {},
       'status': status,
     });
   }
