@@ -59,6 +59,15 @@ class MyRidesScreen extends StatelessWidget {
 
         final rides = snapshot.data!.docs;
 
+        // Sort the rides by dateTime in descending order (latest to oldest)
+        rides.sort((a, b) {
+          final aData = a.data() as Map<String, dynamic>;
+          final bData = b.data() as Map<String, dynamic>;
+          final aDateTime = (aData['dateTime'] as Timestamp).toDate();
+          final bDateTime = (bData['dateTime'] as Timestamp).toDate();
+          return bDateTime.compareTo(aDateTime);
+        });
+
         return ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
