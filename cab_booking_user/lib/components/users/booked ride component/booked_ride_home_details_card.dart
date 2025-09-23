@@ -17,7 +17,7 @@ class BookedRideDetailsCard extends StatelessWidget {
     final String formattedDate = DateFormat('dd MMM').format(rideDateTime);
 
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8.0),
+      margin: const EdgeInsets.only(bottom: 8), // ✅ no top margin
       decoration: BoxDecoration(
         color: Colors.grey.shade100,
         borderRadius: BorderRadius.circular(12.0),

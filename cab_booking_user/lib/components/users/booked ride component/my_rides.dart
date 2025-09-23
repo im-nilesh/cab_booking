@@ -13,9 +13,9 @@ class MyRidesScreen extends StatelessWidget {
 
     if (currentUser == null) {
       return const Align(
-        alignment: Alignment.topCenter,
+        alignment: Alignment.topLeft,
         child: Padding(
-          padding: EdgeInsets.only(top: 8),
+          padding: EdgeInsets.only(top: 0), // ✅ no gap
           child: Text("Please log in to see your rides."),
         ),
       );
@@ -31,27 +31,27 @@ class MyRidesScreen extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Align(
-            alignment: Alignment.topCenter,
+            alignment: Alignment.topLeft,
             child: Padding(
-              padding: EdgeInsets.only(top: 8),
+              padding: EdgeInsets.only(top: 0),
               child: CircularProgressIndicator(),
             ),
           );
         }
         if (snapshot.hasError) {
           return Align(
-            alignment: Alignment.topCenter,
+            alignment: Alignment.topLeft,
             child: Padding(
-              padding: const EdgeInsets.only(top: 8),
+              padding: const EdgeInsets.only(top: 0),
               child: Text('Error: ${snapshot.error}'),
             ),
           );
         }
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
           return const Align(
-            alignment: Alignment.topCenter,
+            alignment: Alignment.topLeft,
             child: Padding(
-              padding: EdgeInsets.only(top: 8),
+              padding: EdgeInsets.only(top: 0),
               child: Text('No successful rides booked yet.'),
             ),
           );
@@ -62,7 +62,7 @@ class MyRidesScreen extends StatelessWidget {
         return ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          padding: EdgeInsets.zero, // ✅ removes top/bottom gaps
+          padding: EdgeInsets.zero, // ✅ removes default ListView padding
           itemCount: rides.length,
           itemBuilder: (context, index) {
             final ride = rides[index].data() as Map<String, dynamic>;
