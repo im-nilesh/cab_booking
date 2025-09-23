@@ -18,3 +18,4 @@ const Color ovalfillColor = Color(0xFFECECEC);
 const Color avatarborderColor = Color(0xFF0AAF48);
 const Color uploadButtonborderColor = Color(0xFF828E89);
 const Color tickbackgroundColor = Color(0xFFB8EFCC);
+const Color cardtopcolor = Color(0xFFD9E7E1);

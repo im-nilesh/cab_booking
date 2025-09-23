@@ -12,7 +12,13 @@ class MyRidesScreen extends StatelessWidget {
     final currentUser = FirebaseAuth.instance.currentUser;
 
     if (currentUser == null) {
-      return const Center(child: Text("Please log in to see your rides."));
+      return const Align(
+        alignment: Alignment.topCenter,
+        child: Padding(
+          padding: EdgeInsets.only(top: 8),
+          child: Text("Please log in to see your rides."),
+        ),
+      );
     }
 
     return StreamBuilder<QuerySnapshot>(
@@ -20,25 +26,43 @@ class MyRidesScreen extends StatelessWidget {
           FirebaseFirestore.instance
               .collection('rides')
               .where('userId', isEqualTo: currentUser.uid)
-              .where(
-                'status',
-                isEqualTo: 'success',
-              ) // Added this line to filter by status
+              .where('status', isEqualTo: 'success')
               .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return const Align(
+            alignment: Alignment.topCenter,
+            child: Padding(
+              padding: EdgeInsets.only(top: 8),
+              child: CircularProgressIndicator(),
+            ),
+          );
         }
         if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
+          return Align(
+            alignment: Alignment.topCenter,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Text('Error: ${snapshot.error}'),
+            ),
+          );
         }
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return const Center(child: Text('No successful rides booked yet.'));
+          return const Align(
+            alignment: Alignment.topCenter,
+            child: Padding(
+              padding: EdgeInsets.only(top: 8),
+              child: Text('No successful rides booked yet.'),
+            ),
+          );
         }
 
         final rides = snapshot.data!.docs;
 
         return ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          padding: EdgeInsets.zero, // ✅ removes top/bottom gaps
           itemCount: rides.length,
           itemBuilder: (context, index) {
             final ride = rides[index].data() as Map<String, dynamic>;

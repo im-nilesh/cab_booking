@@ -1,4 +1,3 @@
-// lib/screens/flowscreen/users/user_homepage.dart
 import 'package:cab_booking_user/components/users/booked%20ride%20component/my_rides.dart';
 import 'package:cab_booking_user/utils/constants.dart';
 import 'package:flutter/material.dart';
@@ -11,12 +10,12 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: whiteColor,
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.fromLTRB(16, 50, 16, 20),
+      body: CustomScrollView(
+        slivers: [
+          // App bar section
+          SliverToBoxAdapter(
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(16, 50, 16, 24),
               decoration: const BoxDecoration(
                 color: greencolor,
                 borderRadius: BorderRadius.only(
@@ -25,43 +24,59 @@ class HomePage extends StatelessWidget {
                 ),
               ),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Top row with logo + notifications
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: Colors.grey.shade200,
-                          borderRadius: BorderRadius.circular(8),
+                          color: Colors.white.withOpacity(0.9),
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                        child: const Text("Logo"),
+                        child: const Text(
+                          "Logo",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                       ),
-                      const Icon(
-                        Icons.notifications,
-                        color: whiteColor,
-                        size: 30,
+                      CircleAvatar(
+                        backgroundColor: Colors.white.withOpacity(0.2),
+                        child: const Icon(
+                          Icons.notifications,
+                          color: whiteColor,
+                        ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 20),
+
+                  // Search field
                   TextField(
                     decoration: InputDecoration(
                       hintText: 'Where to?',
-                      hintStyle: GoogleFonts.outfit(color: Colors.black54),
+                      hintStyle: GoogleFonts.outfit(
+                        color: Colors.black54,
+                        fontSize: 16,
+                      ),
                       prefixIcon: const Icon(Icons.search),
                       suffixIcon: Container(
+                        margin: const EdgeInsets.only(right: 8),
                         padding: const EdgeInsets.symmetric(
                           horizontal: 12,
-                          vertical: 8,
+                          vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.1),
+                          color: Colors.grey.shade200,
                           borderRadius: BorderRadius.circular(20),
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisSize: MainAxisSize.min,
-                          children: [Text("Now"), Icon(Icons.arrow_drop_down)],
+                          children: const [
+                            Text("Now"),
+                            Icon(Icons.arrow_drop_down),
+                          ],
                         ),
                       ),
                       filled: true,
@@ -70,35 +85,49 @@ class HomePage extends StatelessWidget {
                         borderRadius: BorderRadius.circular(30),
                         borderSide: BorderSide.none,
                       ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 14,
+                        horizontal: 16,
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "My rides",
-                    style: GoogleFonts.outfit(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  SizedBox(
-                    height:
-                        MediaQuery.of(context).size.height *
-                        0.5, // Adjust height as needed
-                    child: const MyRidesScreen(),
-                  ),
-                ],
+          ),
+
+          // "My Rides" title
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                16,
+                16,
+                16,
+                0,
+              ), // removed bottom padding
+              child: Text(
+                "My rides",
+                style: GoogleFonts.outfit(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
-          ],
-        ),
+          ),
+
+          // Rides list (directly below title, no gap)
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                16,
+                8,
+                16,
+                16,
+              ), // tighter spacing
+              child: const MyRidesScreen(),
+            ),
+          ),
+        ],
       ),
     );
   }
