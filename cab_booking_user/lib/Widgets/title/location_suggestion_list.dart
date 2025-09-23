@@ -1,5 +1,5 @@
 import 'package:cab_booking_user/Widgets/title/location_suggestion_title_widget.dart';
-import 'package:cab_booking_user/components/users/search%20components/no_rides_found.dart';
+import 'package:cab_booking_user/components/users/search%20screen%20components/no_rides_found.dart';
 import 'package:cab_booking_user/providers/location_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

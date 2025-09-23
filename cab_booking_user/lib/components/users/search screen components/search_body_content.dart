@@ -2,7 +2,7 @@
 
 import 'package:cab_booking_user/Widgets/car/car_option_list.dart';
 import 'package:cab_booking_user/Widgets/title/location_suggestion_list.dart';
-import 'package:cab_booking_user/components/users/search%20components/no_rides_found.dart';
+import 'package:cab_booking_user/components/users/search%20screen%20components/no_rides_found.dart';
 import 'package:flutter/material.dart';
 
 class SearchBodyContent extends StatelessWidget {
