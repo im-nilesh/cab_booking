@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -14,7 +15,11 @@ class HomeScreen extends ConsumerWidget {
 
     if (user == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Home'), centerTitle: true),
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          automaticallyImplyLeading: false,
+        ),
         body: const Center(child: Text('Please log in to see your rides.')),
       );
     }
@@ -22,66 +27,99 @@ class HomeScreen extends ConsumerWidget {
     final driverRidesAsyncValue = ref.watch(driverRidesProvider(user.uid));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('My Assigned Rides'), centerTitle: true),
-      body: driverRidesAsyncValue.when(
-        data: (driverRideDocs) {
-          if (driverRideDocs.isEmpty) {
-            return const Center(child: Text('No rides assigned to you yet.'));
-          }
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0, // flat like screenshot
+        automaticallyImplyLeading: false,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: driverRidesAsyncValue.when(
+          data: (driverRideDocs) {
+            if (driverRideDocs.isEmpty) {
+              return const Center(child: Text('No rides assigned to you yet.'));
+            }
 
-          return ListView.builder(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            itemCount: driverRideDocs.length,
-            itemBuilder: (context, index) {
-              final rideId = driverRideDocs[index]['rideId'];
-              final rideDetailsAsyncValue = ref.watch(
-                rideDetailsProvider(rideId),
-              );
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Section Title "My Assigned Rides"
+                Text(
+                  'My Assigned Rides',
+                  style: GoogleFonts.outfit(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black,
+                  ),
+                ),
+                const SizedBox(height: 16),
 
-              return rideDetailsAsyncValue.when(
-                data: (rideDoc) {
-                  if (!rideDoc.exists) {
-                    return const Card(
-                      margin: EdgeInsets.all(8.0),
-                      child: ListTile(title: Text('Ride details not found.')),
-                    );
-                  }
+                // Ride list
+                Expanded(
+                  child: ListView.builder(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    itemCount: driverRideDocs.length,
+                    itemBuilder: (context, index) {
+                      final rideId = driverRideDocs[index]['rideId'];
+                      final rideDetailsAsyncValue = ref.watch(
+                        rideDetailsProvider(rideId),
+                      );
 
-                  final rideData = rideDoc.data() as Map<String, dynamic>;
+                      return rideDetailsAsyncValue.when(
+                        data: (rideDoc) {
+                          if (!rideDoc.exists) {
+                            return const Card(
+                              margin: EdgeInsets.all(8.0),
+                              child: ListTile(
+                                title: Text('Ride details not found.'),
+                              ),
+                            );
+                          }
 
-                  // Ensure dateTime is valid
-                  if (rideData['dateTime'] == null) {
-                    rideData['dateTime'] = Timestamp.now();
-                  }
+                          final rideData =
+                              rideDoc.data() as Map<String, dynamic>;
 
-                  // Ensure origin/destination exist
-                  rideData['origin'] ??= 'Origin';
-                  rideData['destination'] ??= 'Destination';
+                          // Ensure dateTime is valid
+                          if (rideData['dateTime'] == null) {
+                            rideData['dateTime'] = Timestamp.now();
+                          }
 
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: DriverRideCard(rideData: rideData),
-                  );
-                },
-                loading:
-                    () => const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Center(child: CircularProgressIndicator()),
-                    ),
-                error:
-                    (error, stack) => Card(
-                      margin: const EdgeInsets.all(8.0),
-                      child: ListTile(
-                        title: Text('Error loading ride: $error'),
-                      ),
-                    ),
-              );
-            },
-          );
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error:
-            (error, stack) => Center(child: Text('An error occurred: $error')),
+                          // Ensure origin/destination exist
+                          rideData['origin'] ??= 'Origin';
+                          rideData['destination'] ??= 'Destination';
+
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 0.0,
+                            ),
+                            child: DriverRideCard(rideData: rideData),
+                          );
+                        },
+                        loading:
+                            () => const Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Center(child: CircularProgressIndicator()),
+                            ),
+                        error:
+                            (error, stack) => Card(
+                              margin: const EdgeInsets.all(8.0),
+                              child: ListTile(
+                                title: Text('Error loading ride: $error'),
+                              ),
+                            ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            );
+          },
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error:
+              (error, stack) =>
+                  Center(child: Text('An error occurred: $error')),
+        ),
       ),
     );
   }
