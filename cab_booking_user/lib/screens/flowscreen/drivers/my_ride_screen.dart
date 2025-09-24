@@ -1,5 +1,4 @@
 import 'package:cab_booking_user/Widgets/app%20bar/custom_appbar.dart';
-
 import 'package:cab_booking_user/components/drivers/My%20Ride%20Screen%20Components/message_to_passenger.dart';
 import 'package:cab_booking_user/components/drivers/My%20Ride%20Screen%20Components/ride_info.dart';
 import 'package:flutter/material.dart';
@@ -11,16 +10,11 @@ class RideDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final message =
-        rideData['message']?.isNotEmpty == true
-            ? rideData['message']
-            : "Hi, this is Saloni & am driving from Kanpur to Delhi and can pickup passengers along my way.\n\nIf you're interested, feel free to join me.";
+    final message = rideData['message'] ?? "";
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5), // Light grey background
-      appBar: const CustomAppBar(
-        title: 'My ride details',
-      ), // Using the custom App Bar
+      appBar: const CustomAppBar(title: 'My ride details'),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(

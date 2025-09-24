@@ -1,11 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class MessageToPassengers extends StatelessWidget {
+class MessageToPassengers extends StatefulWidget {
   final String message;
 
   const MessageToPassengers({Key? key, required this.message})
     : super(key: key);
+
+  @override
+  State<MessageToPassengers> createState() => _MessageToPassengersState();
+}
+
+class _MessageToPassengersState extends State<MessageToPassengers> {
+  late TextEditingController _controller;
+  bool _isEditing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.message);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _toggleEditing() {
+    setState(() {
+      _isEditing = !_isEditing;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +48,14 @@ class MessageToPassengers extends StatelessWidget {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            Icon(Icons.edit, size: 20, color: Colors.grey.shade700),
+            IconButton(
+              icon: Icon(
+                _isEditing ? Icons.check : Icons.edit,
+                size: 20,
+                color: Colors.grey.shade700,
+              ),
+              onPressed: _toggleEditing,
+            ),
           ],
         ),
         const SizedBox(height: 12),
@@ -34,16 +67,31 @@ class MessageToPassengers extends StatelessWidget {
             color: Colors.white,
             border: Border.all(color: Colors.grey.shade200),
           ),
-          child: Text(
-            message.isNotEmpty
-                ? message
-                : "No message added yet. Tap the edit icon to add one.",
-            style: GoogleFonts.outfit(
-              fontSize: 14,
-              color: Colors.grey.shade800,
-              height: 1.5,
-            ),
-          ),
+          child:
+              _isEditing
+                  ? TextField(
+                    controller: _controller,
+                    maxLines: null,
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      hintText: "Type your message here...",
+                    ),
+                    style: GoogleFonts.outfit(
+                      fontSize: 14,
+                      color: Colors.grey.shade800,
+                      height: 1.5,
+                    ),
+                  )
+                  : Text(
+                    _controller.text.isNotEmpty
+                        ? _controller.text
+                        : "No message added yet. Tap the edit icon to add one.",
+                    style: GoogleFonts.outfit(
+                      fontSize: 14,
+                      color: Colors.grey.shade800,
+                      height: 1.5,
+                    ),
+                  ),
         ),
       ],
     );

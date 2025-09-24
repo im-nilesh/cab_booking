@@ -11,29 +11,10 @@ class RideRequestsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final requests = rideData['requests'] as List<dynamic>? ?? [];
 
-    if (requests.isEmpty) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: Center(
-          child: Text(
-            "No ride requests yet",
-            style: GoogleFonts.outfit(
-              color: Colors.grey.shade600,
-              fontSize: 14,
-            ),
-          ),
-        ),
-      );
-    }
-
     // This part is for when there are requests.
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          "Ride Requests",
-          style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.w600),
-        ),
         const SizedBox(height: 8),
         ...requests.map<Widget>((req) {
           final requestData = req as Map<String, dynamic>;

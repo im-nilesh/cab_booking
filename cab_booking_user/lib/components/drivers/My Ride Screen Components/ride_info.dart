@@ -95,7 +95,7 @@ class RideInfoSection extends StatelessWidget {
                 ),
                 // Seats Left
                 Text(
-                  "${rideData['seatsLeft'] ?? '0'} seats left",
+                  "${rideData['seatsLeft'] ?? ''} Seats Full",
                   style: GoogleFonts.outfit(
                     color: greencolor,
                     fontSize: 14,
@@ -104,7 +104,7 @@ class RideInfoSection extends StatelessWidget {
                 ),
               ],
             ),
-            const Divider(height: 24),
+
             // Ride Requests Section embedded here
             RideRequestsSection(rideData: rideData),
           ],
