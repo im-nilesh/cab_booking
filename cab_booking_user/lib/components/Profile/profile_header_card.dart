@@ -39,7 +39,7 @@ class ProfileHeaderCard extends StatelessWidget {
           ),
           const SizedBox(width: 12),
 
-          // Name + Rating
+          // Name + (optional) Rating
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -52,13 +52,16 @@ class ProfileHeaderCard extends StatelessWidget {
                     color: whiteColor,
                   ),
                 ),
-                const SizedBox(height: 6),
-                RatingCard(
-                  rating: rating,
-                  backgroundColor: whiteColor,
-                  textColor: blackColor,
-                  iconColor: blackColor,
-                ),
+                // Only show RatingCard for drivers
+                if (isDriver) ...[
+                  const SizedBox(height: 6),
+                  RatingCard(
+                    rating: rating,
+                    backgroundColor: whiteColor,
+                    textColor: blackColor,
+                    iconColor: blackColor,
+                  ),
+                ],
               ],
             ),
           ),

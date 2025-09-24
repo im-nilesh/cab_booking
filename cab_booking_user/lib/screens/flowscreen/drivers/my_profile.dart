@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 class MyProfileScreen extends StatelessWidget {
   final bool isDriver;
 
-  const MyProfileScreen({super.key, this.isDriver = false});
+  const MyProfileScreen({super.key, this.isDriver = true});
 
   @override
   Widget build(BuildContext context) {

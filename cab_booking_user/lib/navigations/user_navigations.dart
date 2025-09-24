@@ -20,7 +20,7 @@ class _UserNavigationState extends State<UserNavigation> {
   late final List<Widget> _widgetOptions = <Widget>[
     const HomePage(),
     SearchPage(), // <-- must NOT be const
-    const ProfilePage(),
+    const UserProfileScreen(),
   ];
 
   void _onItemTapped(int index) {
