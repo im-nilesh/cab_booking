@@ -66,17 +66,7 @@ class _DriverNavigationState extends State<DriverNavigation> {
               selectedColor: greencolor,
               unselectedColor: Colors.grey.shade500,
             ),
-            CustomNavItem(
-              index: 2,
-              selectedIndex: _selectedIndex,
-              inactiveIconPath: '', // Placeholder path
-              activeIconPath:
-                  'assets/images/svg/createrideselected.svg', // Placeholder path
-              label: 'Create Ride',
-              onTap: () => _onItemTapped(2),
-              selectedColor: greencolor,
-              unselectedColor: Colors.grey.shade500,
-            ),
+
             CustomNavItem(
               index: 1,
               selectedIndex: _selectedIndex,
