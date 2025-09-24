@@ -1,4 +1,5 @@
 // lib/components/drivers/driver_ride_card.dart
+import 'package:cab_booking_user/screens/flowscreen/drivers/my_ride_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -15,11 +16,12 @@ class DriverRideCard extends StatelessWidget {
     final String formattedDate = DateFormat('dd MMM').format(rideDateTime);
 
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8.0),
+      margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
       elevation: 2,
       child: Column(
         children: [
+          // Ride duration placeholder
           Container(
             padding: const EdgeInsets.symmetric(
               vertical: 12.0,
@@ -38,7 +40,7 @@ class DriverRideCard extends StatelessWidget {
                 const Icon(Icons.timer_outlined, color: Colors.black),
                 const SizedBox(width: 8.0),
                 Text(
-                  "02 hour : 30 min", // This is a placeholder
+                  "02 hour : 30 min", // TODO: Replace with dynamic duration
                   style: GoogleFonts.outfit(
                     fontWeight: FontWeight.bold,
                     fontSize: 16.0,
@@ -47,11 +49,14 @@ class DriverRideCard extends StatelessWidget {
               ],
             ),
           ),
+
+          // Ride info
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                // Date & Time
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -72,6 +77,8 @@ class DriverRideCard extends StatelessWidget {
                     ),
                   ],
                 ),
+
+                // Origin -> Destination
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -111,8 +118,12 @@ class DriverRideCard extends StatelessWidget {
                     ),
                   ],
                 ),
+
+                // Seat info
                 Text(
-                  "Seat full",
+                  rideData['seatsLeft'] != null && rideData['seatsLeft'] > 0
+                      ? "${rideData['seatsLeft']} seats left"
+                      : "Seat full",
                   style: GoogleFonts.outfit(
                     color: Colors.green,
                     fontWeight: FontWeight.bold,
@@ -121,12 +132,25 @@ class DriverRideCard extends StatelessWidget {
               ],
             ),
           ),
+
           const Divider(height: 1),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: Text(
-              "View in detail >",
-              style: GoogleFonts.outfit(color: Colors.grey.shade700),
+
+          // View details button
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => RideDetailsScreen(rideData: rideData),
+                ),
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12.0),
+              child: Text(
+                "View in detail >",
+                style: GoogleFonts.outfit(color: Colors.grey.shade700),
+              ),
             ),
           ),
         ],
