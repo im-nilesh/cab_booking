@@ -13,6 +13,7 @@ class MessageToPassengers extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
               "Your message to passengers",
@@ -21,23 +22,26 @@ class MessageToPassengers extends StatelessWidget {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            const Spacer(),
-            Icon(Icons.edit, size: 18, color: Colors.grey.shade600),
+            Icon(Icons.edit, size: 20, color: Colors.grey.shade700),
           ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 12),
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
-            color: Colors.grey.shade100,
+            color: Colors.white,
+            border: Border.all(color: Colors.grey.shade200),
           ),
           child: Text(
-            message.isNotEmpty ? message : "No message added yet",
+            message.isNotEmpty
+                ? message
+                : "No message added yet. Tap the edit icon to add one.",
             style: GoogleFonts.outfit(
               fontSize: 14,
               color: Colors.grey.shade800,
+              height: 1.5,
             ),
           ),
         ),

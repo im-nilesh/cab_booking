@@ -9,33 +9,48 @@ class RideRequestsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final requests = rideData['requests'] ?? [];
+    final requests = rideData['requests'] as List<dynamic>? ?? [];
 
-    return requests.isEmpty
-        ? Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey.shade300),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Center(
-            child: Text(
-              "No ride requests yet",
-              style: GoogleFonts.outfit(color: Colors.grey.shade600),
+    if (requests.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: Center(
+          child: Text(
+            "No ride requests yet",
+            style: GoogleFonts.outfit(
+              color: Colors.grey.shade600,
+              fontSize: 14,
             ),
           ),
-        )
-        : Column(
-          children:
-              requests.map<Widget>((req) {
-                return Card(
-                  child: ListTile(
-                    title: Text(req['name'] ?? 'Unknown'),
-                    subtitle: Text(req['pickup'] ?? 'Pickup location'),
-                    trailing: Text(req['status'] ?? 'Pending'),
-                  ),
-                );
-              }).toList(),
-        );
+        ),
+      );
+    }
+
+    // This part is for when there are requests.
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Ride Requests",
+          style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 8),
+        ...requests.map<Widget>((req) {
+          final requestData = req as Map<String, dynamic>;
+          return ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const CircleAvatar(child: Icon(Icons.person)),
+            title: Text(requestData['name'] ?? 'Unknown Passenger'),
+            subtitle: Text(
+              requestData['pickup'] ?? 'Pickup location not specified',
+            ),
+            trailing: Text(
+              requestData['status'] ?? 'Pending',
+              style: const TextStyle(color: Colors.orange),
+            ),
+          );
+        }).toList(),
+      ],
+    );
   }
 }
