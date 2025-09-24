@@ -1,5 +1,4 @@
 import 'package:cab_booking_user/Widgets/button/custom_nav_item.dart';
-import 'package:cab_booking_user/screens/flowscreen/drivers/create_ride.dart';
 import 'package:cab_booking_user/screens/flowscreen/drivers/home.dart';
 import 'package:cab_booking_user/screens/flowscreen/drivers/my_activity.dart';
 import 'package:cab_booking_user/screens/flowscreen/drivers/my_profile.dart';
@@ -20,7 +19,6 @@ class _DriverNavigationState extends State<DriverNavigation> {
   static const List<Widget> _widgetOptions = <Widget>[
     HomeScreen(),
     MyActivityScreen(),
-    CreateRide(),
     MyProfileScreen(),
   ];
 
@@ -80,14 +78,14 @@ class _DriverNavigationState extends State<DriverNavigation> {
               unselectedColor: Colors.grey.shade500,
             ),
             CustomNavItem(
-              index: 3,
+              index: 2,
               selectedIndex: _selectedIndex,
               inactiveIconPath:
                   'assets/images/svg/profile-circle.svg', // Placeholder path
               activeIconPath:
                   'assets/images/svg/profile-circle.svg', // Placeholder path
               label: 'Profile',
-              onTap: () => _onItemTapped(3),
+              onTap: () => _onItemTapped(2),
               selectedColor: greencolor,
               unselectedColor: Colors.grey.shade500,
             ),
@@ -96,9 +94,4 @@ class _DriverNavigationState extends State<DriverNavigation> {
       ),
     );
   }
-}
-
-// Example Theme file (lib/theme/theme.dart)
-class AppTheme {
-  static const Color primaryColor = Color(0xFF007BFF); // Example blue color
 }
