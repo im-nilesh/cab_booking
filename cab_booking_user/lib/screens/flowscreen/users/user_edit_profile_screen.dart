@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cab_booking_user/Widgets/app%20bar/custom_appbar.dart';
 import 'package:cab_booking_user/Widgets/textfield/edit_profile_text_field.dart';
-import 'package:cab_booking_user/components/Profile/profile_photo_picker.dart';
+import 'package:cab_booking_user/components/profile/profile_photo_picker.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});

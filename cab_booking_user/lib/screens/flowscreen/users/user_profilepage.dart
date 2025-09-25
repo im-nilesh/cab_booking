@@ -1,5 +1,5 @@
-import 'package:cab_booking_user/components/Profile/profile_header_card.dart';
-import 'package:cab_booking_user/components/Profile/profile_menu_item.dart';
+import 'package:cab_booking_user/components/profile/profile_header_card.dart';
+import 'package:cab_booking_user/components/profile/profile_menu_item.dart';
 import 'package:cab_booking_user/screens/flowscreen/users/user_edit_profile_screen.dart';
 import 'package:flutter/material.dart';
 

@@ -1,6 +1,6 @@
 import 'package:cab_booking_user/utils/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:cab_booking_user/components/Profile/rating_card.dart';
+import 'package:cab_booking_user/components/profile/rating_card.dart';
 
 class ProfileHeaderCard extends StatelessWidget {
   final String name;
