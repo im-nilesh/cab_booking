@@ -1,5 +1,6 @@
 import 'package:cab_booking_user/components/Profile/profile_header_card.dart';
 import 'package:cab_booking_user/components/Profile/profile_menu_item.dart';
+import 'package:cab_booking_user/screens/flowscreen/drivers/my_vehical_screen.dart';
 import 'package:cab_booking_user/screens/flowscreen/users/user_edit_profile_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -34,7 +35,14 @@ class MyProfileScreen extends StatelessWidget {
             ProfileMenuItem(
               icon: Icons.directions_car,
               title: 'My Vehicle Details',
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const VehicleDetailsScreen(),
+                  ),
+                );
+              },
             ),
             ProfileMenuItem(
               icon: Icons.settings,
