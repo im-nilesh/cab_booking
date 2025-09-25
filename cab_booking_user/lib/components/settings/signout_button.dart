@@ -1,4 +1,6 @@
-// lib/widgets/settings/sign_out_button.dart
+import 'package:cab_booking_user/components/drivers/Vehical%20Screen%20Edit%20Components/custom_confirm_popup.dart';
+import 'package:cab_booking_user/screens/welcome_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class SignOutButton extends StatelessWidget {
@@ -14,7 +16,22 @@ class SignOutButton extends StatelessWidget {
       height: 50,
       child: ElevatedButton(
         onPressed: () {
-          // Handle sign out
+          showDialog(
+            context: context,
+            builder:
+                (context) => DocumentActionDialog(
+                  title: 'Are you sure want to Sign out',
+                  confirmText: 'Yes',
+                  onConfirm: () async {
+                    await FirebaseAuth.instance.signOut();
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => WelcomeScreen()),
+                      (route) => false,
+                    );
+                  },
+                ),
+          );
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: lightRedBg,
