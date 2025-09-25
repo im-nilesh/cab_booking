@@ -1,3 +1,4 @@
+// lib/screens/auth/signup_screen.dart
 import 'package:cab_booking_user/navigations/user_navigations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,7 +22,14 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   final TextEditingController _phoneController = TextEditingController();
 
   @override
+  void dispose() {
+    _phoneController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // Watch the auth state (type: AuthProviderState)
     final authState = ref.watch(authProvider);
     final authNotifier = ref.read(authProvider.notifier);
 
@@ -29,18 +37,20 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       children: [
         Scaffold(
           appBar: AppBar(
+            backgroundColor: whiteColor,
+            elevation: 0,
             leading: IconButton(
               icon: Icon(Icons.arrow_back, color: blackColor),
-              onPressed: () {
-                Navigator.pop(context);
-              },
+              onPressed: () => Navigator.pop(context),
             ),
+            title: const Text('Sign Up', style: TextStyle(color: blackColor)),
           ),
           body: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const SizedBox(height: 20),
                 Text(
                   'Enter your mobile number',
                   style: TextStyle(
@@ -49,7 +59,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Row(
                   children: [
                     GestureDetector(
@@ -66,7 +76,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                         );
                       },
                       child: Container(
-                        padding: EdgeInsets.symmetric(
+                        padding: const EdgeInsets.symmetric(
                           horizontal: 12,
                           vertical: 14,
                         ),
@@ -79,15 +89,18 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                           children: [
                             Text(
                               _selectedCountryFlag,
-                              style: TextStyle(fontSize: 18),
+                              style: const TextStyle(fontSize: 18),
                             ),
-                            SizedBox(width: 8),
-                            Icon(Icons.arrow_drop_down, color: Colors.black),
+                            const SizedBox(width: 8),
+                            const Icon(
+                              Icons.arrow_drop_down,
+                              color: Colors.black,
+                            ),
                           ],
                         ),
                       ),
                     ),
-                    SizedBox(width: 10),
+                    const SizedBox(width: 10),
                     Expanded(
                       child: CustomPhonenoTextfield(
                         phoneController: _phoneController,
@@ -96,7 +109,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                     ),
                   ],
                 ),
-                SizedBox(height: 30),
+                const SizedBox(height: 30),
                 SizedBox(
                   width: double.infinity,
                   height: MediaQuery.of(context).size.height * 0.07,
@@ -104,7 +117,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                     text: 'Continue',
                     onPressed:
                         authState.isLoading
-                            ? () {} // Corrected: Pass an empty function
+                            ? () {}
                             : () {
                               authNotifier.sendOTP(
                                 context: context,
@@ -114,12 +127,11 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                             },
                   ),
                 ),
-                SizedBox(height: 20),
               ],
             ),
           ),
         ),
-        if (authState.isLoading) const CustomProgressIndicator(),
+        if (authState.isLoading) const Center(child: CustomProgressIndicator()),
       ],
     );
   }

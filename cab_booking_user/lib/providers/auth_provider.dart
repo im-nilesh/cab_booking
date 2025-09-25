@@ -1,3 +1,8 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:cab_booking_user/navigations/user_navigations.dart';
 import 'package:cab_booking_user/navigations/driver_navigation.dart';
 import 'package:cab_booking_user/screens/auth/driver/admin_rejected_profile.dart';
@@ -5,23 +10,19 @@ import 'package:cab_booking_user/screens/auth/driver/driver_registration_complet
 import 'package:cab_booking_user/screens/auth/driver/driver_profile_created_screen.dart';
 import 'package:cab_booking_user/screens/auth/otp_screen.dart';
 import 'package:cab_booking_user/screens/user_choice.dart';
-import 'package:cab_booking_user/screens/welcome_screen.dart'; // Import WelcomeScreen
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cab_booking_user/screens/welcome_screen.dart';
 
-/// Watches Firebase authentication state
+/// Watch Firebase auth changes
 final authStateChangesProvider = StreamProvider<User?>((ref) {
   return FirebaseAuth.instance.authStateChanges();
 });
 
-/// Checks if logged-in user exists in "users" or "drivers"
-final userRoleProvider = FutureProvider<String>((ref) async {
-  final user = FirebaseAuth.instance.currentUser;
-  if (user == null) return "unauthenticated";
-
-  final uid = user.uid;
+/// Family provider for role lookup
+final userRoleProviderFamily = FutureProvider.family<String, String?>((
+  ref,
+  uid,
+) async {
+  if (uid == null) return "unauthenticated";
 
   final driverDoc =
       await FirebaseFirestore.instance.collection('drivers').doc(uid).get();
@@ -34,49 +35,49 @@ final userRoleProvider = FutureProvider<String>((ref) async {
   return "new_user";
 });
 
-/// Watches only the driver's registration status in Firestore
-final driverStatusProvider = StreamProvider<String>((ref) {
-  final user = FirebaseAuth.instance.currentUser;
-  if (user == null) {
-    return Stream.value('unauthenticated');
-  }
+/// Family provider for driver's registration status
+final driverStatusProviderFamily = StreamProvider.family<String, String?>((
+  ref,
+  uid,
+) {
+  if (uid == null) return Stream.value('unauthenticated');
 
   return FirebaseFirestore.instance
       .collection('drivers')
-      .doc(user.uid)
+      .doc(uid)
       .snapshots()
       .map((doc) {
         if (!doc.exists) return 'new_driver';
-        final data = doc.data() as Map<String, dynamic>;
+        final data = doc.data() as Map<String, dynamic>? ?? {};
         final status = data['registration_status'] ?? 'incomplete';
 
         switch (status) {
-          case 'pending_review': // driver uploaded docs, waiting for admin
+          case 'pending_review':
             return 'pending';
-          case 'approved': // admin approved
+          case 'approved':
             return 'approved';
           case 'rejected':
             return 'rejected';
-          case 'incomplete': // started but not finished
+          case 'incomplete':
           default:
             return 'incomplete';
         }
       });
 });
 
-/// State for AuthProvider
-class AuthProvider {
+/// Simple state type for OTP/loading flows
+class AuthProviderState {
   final bool isLoading;
-  AuthProvider({this.isLoading = false});
+  AuthProviderState({this.isLoading = false});
 
-  AuthProvider copyWith({bool? isLoading}) {
-    return AuthProvider(isLoading: isLoading ?? this.isLoading);
+  AuthProviderState copyWith({bool? isLoading}) {
+    return AuthProviderState(isLoading: isLoading ?? this.isLoading);
   }
 }
 
-/// Auth State Notifier
-class AuthNotifier extends StateNotifier<AuthProvider> {
-  AuthNotifier() : super(AuthProvider());
+/// Auth Notifier used for OTP flows + saving user data
+class AuthNotifier extends StateNotifier<AuthProviderState> {
+  AuthNotifier() : super(AuthProviderState());
 
   /// Send OTP
   Future<void> sendOTP({
@@ -92,7 +93,6 @@ class AuthNotifier extends StateNotifier<AuthProvider> {
     }
 
     state = state.copyWith(isLoading: true);
-
     try {
       await FirebaseAuth.instance.verifyPhoneNumber(
         phoneNumber: '$countryCode$phoneNumber',
@@ -180,7 +180,7 @@ class AuthNotifier extends StateNotifier<AuthProvider> {
     }
   }
 
-  /// Save User Data in Firestore
+  /// Save user data in Firestore
   Future<bool> saveUserData({
     required String firstName,
     required String lastName,
@@ -194,7 +194,7 @@ class AuthNotifier extends StateNotifier<AuthProvider> {
       await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
         'firstName': firstName,
         'lastName': lastName,
-        'age': int.parse(age),
+        'age': int.tryParse(age) ?? 0,
         'createdAt': FieldValue.serverTimestamp(),
         'role': 'user',
         'phone_number': user.phoneNumber,
@@ -209,11 +209,13 @@ class AuthNotifier extends StateNotifier<AuthProvider> {
   }
 }
 
-final authProvider = StateNotifierProvider<AuthNotifier, AuthProvider>((ref) {
+final authProvider = StateNotifierProvider<AuthNotifier, AuthProviderState>((
+  ref,
+) {
   return AuthNotifier();
 });
 
-/// AuthGate decides where user goes based on role + status
+/// AuthGate: decides navigation based on role + driver status
 class AuthGate extends ConsumerWidget {
   const AuthGate({super.key});
 
@@ -223,16 +225,19 @@ class AuthGate extends ConsumerWidget {
 
     return authState.when(
       data: (user) {
-        if (user == null) {
-          return WelcomeScreen(); // Navigate to WelcomeScreen if not logged in
-        }
+        if (user == null) return WelcomeScreen();
 
-        final roleAsync = ref.watch(userRoleProvider);
+        final roleAsync = ref.watch(userRoleProviderFamily(user.uid));
+
         return roleAsync.when(
           data: (role) {
             if (role == 'user') return const UserNavigation();
+
             if (role == 'driver') {
-              final driverStatus = ref.watch(driverStatusProvider);
+              final driverStatus = ref.watch(
+                driverStatusProviderFamily(user.uid),
+              );
+
               return driverStatus.when(
                 data: (status) {
                   switch (status) {
@@ -264,6 +269,7 @@ class AuthGate extends ConsumerWidget {
             }
 
             if (role == 'new_user') return const UserChoice();
+
             return const Scaffold(body: Center(child: Text('Unknown role')));
           },
           loading:
