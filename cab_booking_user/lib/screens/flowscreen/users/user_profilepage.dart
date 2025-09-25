@@ -1,5 +1,6 @@
 import 'package:cab_booking_user/components/Profile/profile_header_card.dart';
 import 'package:cab_booking_user/components/Profile/profile_menu_item.dart';
+import 'package:cab_booking_user/screens/flowscreen/users/user_edit_profile_screen.dart';
 import 'package:flutter/material.dart';
 
 class UserProfileScreen extends StatelessWidget {
@@ -17,6 +18,14 @@ class UserProfileScreen extends StatelessWidget {
               name: "Manoj Pandey",
               imageUrl: 'assets/images/image11.png',
               isDriver: false,
+              onEdit: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const EditProfileScreen(),
+                  ),
+                );
+              },
             ),
             const SizedBox(height: 20),
             ProfileMenuItem(

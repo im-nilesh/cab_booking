@@ -7,6 +7,7 @@ class ProfileHeaderCard extends StatelessWidget {
   final String imageUrl;
   final bool isDriver;
   final double rating;
+  final VoidCallback onEdit;
 
   const ProfileHeaderCard({
     super.key,
@@ -14,6 +15,7 @@ class ProfileHeaderCard extends StatelessWidget {
     required this.imageUrl,
     this.isDriver = false,
     this.rating = 0.0,
+    required this.onEdit,
   });
 
   @override
@@ -68,7 +70,7 @@ class ProfileHeaderCard extends StatelessWidget {
 
           // Edit button
           IconButton(
-            onPressed: () {},
+            onPressed: onEdit,
             icon: const Icon(Icons.edit, color: whiteColor),
           ),
         ],

@@ -1,5 +1,6 @@
 import 'package:cab_booking_user/components/Profile/profile_header_card.dart';
 import 'package:cab_booking_user/components/Profile/profile_menu_item.dart';
+import 'package:cab_booking_user/screens/flowscreen/users/user_edit_profile_screen.dart';
 import 'package:flutter/material.dart';
 
 class MyProfileScreen extends StatelessWidget {
@@ -20,6 +21,14 @@ class MyProfileScreen extends StatelessWidget {
               imageUrl: 'assets/images/image11.png',
               isDriver: isDriver,
               rating: 4.2,
+              onEdit: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const EditProfileScreen(),
+                  ),
+                );
+              },
             ),
             const SizedBox(height: 20),
             ProfileMenuItem(
