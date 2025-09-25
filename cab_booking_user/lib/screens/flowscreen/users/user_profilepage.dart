@@ -1,6 +1,6 @@
-// lib/screens/flowscreen/users/user_profilepage.dart
 import 'package:cab_booking_user/components/profile/profile_header_card.dart';
 import 'package:cab_booking_user/components/profile/profile_menu_item.dart';
+import 'package:cab_booking_user/screens/common/help.dart';
 import 'package:cab_booking_user/screens/common/settings.dart';
 import 'package:cab_booking_user/screens/flowscreen/users/user_edit_profile_screen.dart';
 import 'package:flutter/material.dart';
@@ -50,7 +50,12 @@ class UserProfileScreen extends StatelessWidget {
             ProfileMenuItem(
               icon: Icons.help_outline,
               title: 'Help',
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const HelpScreen()),
+                );
+              },
             ),
             ProfileMenuItem(
               icon: Icons.privacy_tip,
