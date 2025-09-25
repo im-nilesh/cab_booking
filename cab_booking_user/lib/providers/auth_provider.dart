@@ -23,15 +23,15 @@ final userRoleProvider = FutureProvider<String>((ref) async {
 
   final uid = user.uid;
 
-  final userDoc =
-      await FirebaseFirestore.instance.collection('users').doc(uid).get();
-  if (userDoc.exists) return "user";
-
   final driverDoc =
       await FirebaseFirestore.instance.collection('drivers').doc(uid).get();
   if (driverDoc.exists) return "driver";
 
-  return "new_user"; // brand new, no entry in either collection
+  final userDoc =
+      await FirebaseFirestore.instance.collection('users').doc(uid).get();
+  if (userDoc.exists) return "user";
+
+  return "new_user";
 });
 
 /// Watches only the driver's registration status in Firestore
@@ -244,7 +244,7 @@ class AuthGate extends ConsumerWidget {
                       return const DriverRegistrationCompleteScreen();
                     case 'rejected':
                       return const AdminRejectedProfileScreen();
-                    case 'approved': // ✅ driver approved by admin
+                    case 'approved':
                       return const DriverNavigation();
                     default:
                       return const Scaffold(
